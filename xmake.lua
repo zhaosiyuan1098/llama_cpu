@@ -1,8 +1,15 @@
 add_rules("mode.debug", "mode.release")
 
+set_languages("c++11")
+
 target("yuangine")
     set_kind("binary")
     add_files("src/*.cpp")
+    add_files("src/modules/*.cpp")
+    add_includedirs("$(projectdir)/include")
+    add_includedirs("$(projectdir)/include/modules")
+    add_includedirs("$(projectdir)/include/operations")
+    add_includedirs("$(projectdir)/params")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
