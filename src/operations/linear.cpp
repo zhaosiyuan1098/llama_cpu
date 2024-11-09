@@ -1,3 +1,5 @@
+#include"linear.h"
+
 template <typename T>
 void linear(Matrix3D<T> &a, Matrix3D<T> &b, Matrix3D<T> &c) {
     // a: m x k   b: n x k   c: m x n

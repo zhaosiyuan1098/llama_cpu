@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include "model.h"
+#include "utlis.h"
 #include "opt_params.h"
 #include "llamaAttention.h"
 
@@ -35,7 +36,7 @@ int main(int argc, char **argv)
 {
     std::string target_model = "LLaMA_7B_2_chat";
     std::string target_data_format = "INT4";
-    std::cout << "hello world! I am yuanigne" << std::endl;
+    std::cout << "hello! I am yuanigne, powered by @zhaosiyuan1098. " << std::endl;
 
     if (argc == 3)
     {
@@ -54,7 +55,6 @@ int main(int argc, char **argv)
         }
         std::cout << "Model: " << argv[1] << " selected" << std::endl;
         target_model = argv[1];
-
         auto data_format_input = argv[2];
         if (data_format_list.count(data_format_input) == 0)
         {
@@ -84,66 +84,67 @@ int main(int argc, char **argv)
                 std::cout << "Using OPT's default data format: " + target_data_format << std::endl;
             }
         }
+    }
 
-        if (isLLaMA7B(target_model))
+    if (isLLaMA7B(target_model))
+    {
+        int format_id = data_format_list[target_data_format];
+        // Load model
+        std::cout << "Loading model... " << std::flush;
+        int model_id = model_config[target_model];
+        std::string m_path = model_path[target_model];
+
+        struct opt_params generation_config;
+        generation_config.n_predict = 512;
+        generation_config.n_vocab = 32000;
+        generation_config.temp = 0.1f;
+        generation_config.repeat_penalty = 1.25f;
+
+        switch (format_id)
         {
-            int format_id = data_format_list[target_data_format];
-            // Load model
-            std::cout << "Loading model... " << std::flush;
-            int model_id = model_config[target_model];
-            std::string m_path = model_path[target_model];
+        case FP32:
+        {
+            std::cout << m_path << std::endl;
+            Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
+            // Fp32LlamaForCausalLM model = Fp32LlamaForCausalLM(m_path, get_opt_model_config(model_id));
+            std::cout << "Finished!" << std::endl;
 
-            struct opt_params generation_config;
-            generation_config.n_predict = 512;
-            generation_config.n_vocab = 32000;
-            generation_config.temp = 0.1f;
-            generation_config.repeat_penalty = 1.25f;
-
-            switch (format_id)
+            // Get input from the user
+            while (true)
             {
-            case FP32:
+                std::cout << "USER: ";
+                std::string input;
+                std::getline(std::cin, input);
+                input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
+
+                // LLaMAGenerate(&model, LLaMA_FP32, input, generation_config, "models/llama_vocab.bin", true);
+            }
+            break;
+        }
+        case INT4:
+        {
+            m_path = "../models/INT4/" + m_path;
+            Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
+            std::cout << "Finished!" << std::endl;
+
+            // Get input from the user
+            while (true)
             {
-                Fp32llamaAttention a= Fp32llamaAttention(m_path, get_opt_model_config(model_id));
-                // Fp32LlamaForCausalLM model = Fp32LlamaForCausalLM(m_path, get_opt_model_config(model_id));
-                std::cout << "Finished!" << std::endl;
+                std::cout << "USER: ";
+                std::string input;
+                std::getline(std::cin, input);
+                input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
 
-                // Get input from the user
-                while (true)
-                {
-                    std::cout << "USER: ";
-                    std::string input;
-                    std::getline(std::cin, input);
-                    input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
-
-                    // LLaMAGenerate(&model, LLaMA_FP32, input, generation_config, "models/llama_vocab.bin", true);
-                }
-                break;
+                // LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, "models/llama_vocab.bin", true);
             }
-            case INT4:
-            {
-                m_path = "INT4/" + m_path;
-                // Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, get_opt_model_config(model_id));
-                std::cout << "Finished!" << std::endl;
-
-                // Get input from the user
-                while (true)
-                {
-                    std::cout << "USER: ";
-                    std::string input;
-                    std::getline(std::cin, input);
-                    input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
-
-                    // LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, "models/llama_vocab.bin", true);
-                }
-                break;
-            }
-            default:
-            {
-                std::cout << std::endl;
-                std::cerr << "At this time, we only support FP32 and INT4 for LLaMA7B." << std::endl;
-                break;
-            }
-            }
+            break;
+        }
+        default:
+        {
+            std::cout << std::endl;
+            std::cerr << "At this time, we only support FP32 and INT4 for LLaMA7B." << std::endl;
+            break;
+        }
         }
     }
     return 0;
