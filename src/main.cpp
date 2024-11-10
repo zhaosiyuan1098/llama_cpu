@@ -1,9 +1,11 @@
 #include <iostream>
+#include <filesystem>
 #include <map>
 #include "model.h"
 #include "utlis.h"
 #include "opt_params.h"
 #include "llamaForCausalLM_int4.h"
+
 
 std::map<std::string, int> model_config = {{"OPT_125m", OPT_125M}, {"OPT_1.3B", OPT_1_3B}, {"OPT_6.7B", OPT_6_7B}, {"LLaMA_7B", LLaMA_7B}, {"LLaMA_7B_AWQ", LLaMA_7B}, {"LLaMA_7B_2_chat", LLaMA_7B}};
 
@@ -123,7 +125,10 @@ int main(int argc, char **argv)
         }
         case INT4:
         {
-            m_path = "../models/INT4/" + m_path;
+            std::string current_path = std::filesystem::current_path().string();
+            std::string absolute_path = current_path.substr(0, current_path.find("/build"));
+            std::string m_path = absolute_path + "/model/INT4/" + model_path[target_model];
+            std::cout << "Loading model from path: " << m_path << std::endl;
             Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, get_opt_model_config(model_id));
             std::cout << "Finished!" << std::endl;
 
