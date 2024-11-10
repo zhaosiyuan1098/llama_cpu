@@ -3,7 +3,7 @@
 #include "model.h"
 #include "utlis.h"
 #include "opt_params.h"
-#include "llamaAttention.h"
+#include "llamaForCausalLM_int4.h"
 
 std::map<std::string, int> model_config = {{"OPT_125m", OPT_125M}, {"OPT_1.3B", OPT_1_3B}, {"OPT_6.7B", OPT_6_7B}, {"LLaMA_7B", LLaMA_7B}, {"LLaMA_7B_AWQ", LLaMA_7B}, {"LLaMA_7B_2_chat", LLaMA_7B}};
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
         case FP32:
         {
             std::cout << m_path << std::endl;
-            Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
+            // Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
             // Fp32LlamaForCausalLM model = Fp32LlamaForCausalLM(m_path, get_opt_model_config(model_id));
             std::cout << "Finished!" << std::endl;
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
         case INT4:
         {
             m_path = "../models/INT4/" + m_path;
-            Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
+            Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, get_opt_model_config(model_id));
             std::cout << "Finished!" << std::endl;
 
             // Get input from the user

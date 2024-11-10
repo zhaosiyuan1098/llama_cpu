@@ -1,10 +1,10 @@
-// #include <cstdlib>
-// #include <string>
-// #include <vector>
+#include <cstdlib>
+#include <string>
+#include <vector>
 
-// #include "llamaDecoderLayer.h"
-// #include "common.h"
-// #include "operators.h"
+#include "llamaDecoderLayer_fp32.h"
+#include "common.h"
+#include "operators.h"
 
 // struct Fp32llamaDecoder_output {
 //     Matrix3D<float> last_hidden_state;

@@ -1,6 +1,5 @@
-// #include "llamaAttention.h"
-// #include "common.h"
-// #include "operators.h"
+#include "llamaAttention_fp32.h"
+
 
 // struct Fp32llamaDecoderLayer_output {
 //     Matrix3D<float> hidden_states;
