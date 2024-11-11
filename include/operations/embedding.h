@@ -1,3 +1,10 @@
+#ifndef EMBEDDING_H
+#define EMBEDDING_H
+
+#include"common.h"
+#include<cassert>
+
+
 class Embedding {
    public:
     Embedding(int embed_dim_, int voc_size_, int padding_idx_, Matrix3D<float> lookup_)
@@ -12,3 +19,7 @@ class Embedding {
 private:
     std::string profile_name = "Embedding";
 };
+
+void load_Embedding_params(Embedding& op, std::string prefix);
+
+#endif

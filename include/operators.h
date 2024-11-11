@@ -8,6 +8,8 @@
 #include"embedding.h"
 #include"rotaryPosEmb.h"
 #include"bmm.h"
+#include"rmsNorm.h"
+#include"embedding.h"
 
 
 

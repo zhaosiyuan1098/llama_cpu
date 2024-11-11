@@ -1,6 +1,21 @@
 #include "llamaAttention_int4.h"
 #include <dirent.h>
 
+static float *attn_weights_arr;
+static float ***key_states_arr_cache;
+static float ***value_states_arr_cache;
+static float *attn_output_fp_arr;
+static int *cache_num;
+static float *query_states_unshape_arr;
+static float *attn_output_arr;
+static float *attn_output_transpose_arr;
+static float *key_states_unshape_arr;
+static float *key_states_arr;
+static float *value_states_unshape_arr;
+static float *value_states_arr;
+static float *query_states_arr;
+static float *value_states_transpose_arr;
+
 Int4llamaAttention::Int4llamaAttention(std::string param_path, const struct model_config config)
 {
     this->embed_dim = config.embed_dim;
@@ -50,3 +65,34 @@ Int4llamaAttention::Int4llamaAttention(std::string param_path, const struct mode
     this->pv_bmm = BMM_F32T(1.0f);
     
 }   
+
+
+void Int4llamaAttention::allocate_memory(const struct model_config config) {
+    allocate_aligned_memory(attn_weights_arr, config.num_heads * config.max_sqlen * config.max_sqlen * sizeof(float));
+    allocate_aligned_memory(attn_output_fp_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(attn_output_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(attn_output_transpose_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(key_states_unshape_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(key_states_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(value_states_unshape_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(value_states_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(query_states_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    allocate_aligned_memory(value_states_transpose_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    cache_num = new int[config.num_layers];
+    for (int i = 0; i < config.num_layers; i++) cache_num[i] = 0;
+    allocate_aligned_memory(query_states_unshape_arr, config.max_sqlen * config.embed_dim * sizeof(float));
+    key_states_arr_cache = new float **[config.num_layers];
+    for (int i = 0; i < config.num_layers; ++i) {
+        key_states_arr_cache[i] = new float *[2];
+        for (int j = 0; j < 2; ++j) {
+            allocate_aligned_memory(key_states_arr_cache[i][j], config.max_sqlen * config.embed_dim * sizeof(float));
+        }
+    }
+    value_states_arr_cache = new float **[config.num_layers];
+    for (int i = 0; i < config.num_layers; ++i) {
+        value_states_arr_cache[i] = new float *[2];
+        for (int j = 0; j < 2; ++j) {
+            allocate_aligned_memory(value_states_arr_cache[i][j], config.max_sqlen * config.embed_dim * sizeof(float));
+        }
+    }
+}

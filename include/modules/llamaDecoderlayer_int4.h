@@ -41,11 +41,12 @@ struct Int4llamaDecoderLayer_input
 class Int4llamaDecoderLayer {
    public:
     Int4llamaDecoderLayer(std::string param_path, const struct model_config config, int layer_idx);
+    void allocate_memory(const struct model_config config);
     struct Int4llamaDecoderLayer_output forward(const struct Int4llamaDecoderLayer_input &input);
 
     int embed_dim, num_attention_heads, hidden_dim, layer_idx;
-    // LlamaRMSNorm input_layernorm, post_attention_layernorm;  // from torch_int.nn
-    // Linear_FP_int4 gate_proj, down_proj, up_proj;
+    LlamaRMSNorm input_layernorm, post_attention_layernorm;  // from torch_int.nn
+    Linear_FP_int4 gate_proj, down_proj, up_proj;
     Int4llamaAttention attn;
     std::string profile_name = "Int4llamaDecoderLayer";
 };
