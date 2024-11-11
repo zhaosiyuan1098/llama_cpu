@@ -45,7 +45,7 @@ class Int4llamaAttention {
     void shape(Matrix3D<float> unshape, Matrix3D<float> shaped, int sqlen);
     int embed_dim, num_heads, head_dim;
     Linear_FP_int4 k_proj, v_proj, q_proj, o_proj;
-    // RotaryPosEmb rotary_pos_emb;
-    // BMM_F32T qk_bmm, pv_bmm;
+    RotaryPosEmb rotary_pos_emb;
+    BMM_F32T qk_bmm, pv_bmm;
     std::string profile_name = "Int4llamaAttention";
 };

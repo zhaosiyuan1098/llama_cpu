@@ -48,4 +48,14 @@
   "directory": "/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine",
   "arguments": ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang", "-c", "-Qunused-arguments", "-target", "arm64-apple-macos15.0", "-isysroot", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk", "-g", "-O0", "-std=c++17", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/modules", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/operations", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/params", "-o", "build/.objs/yuangine/macosx/arm64/debug/src/modules/llamaForCausalLM_int4.cpp.o", "src/modules/llamaForCausalLM_int4.cpp"],
   "file": "src/modules/llamaForCausalLM_int4.cpp"
+},
+{
+  "directory": "/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine",
+  "arguments": ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang", "-c", "-Qunused-arguments", "-target", "arm64-apple-macos15.0", "-isysroot", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk", "-g", "-O0", "-std=c++17", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/modules", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/operations", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/params", "-o", "build/.objs/yuangine/macosx/arm64/debug/src/operations/linear.cpp.o", "src/operations/linear.cpp"],
+  "file": "src/operations/linear.cpp"
+},
+{
+  "directory": "/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine",
+  "arguments": ["/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang", "-c", "-Qunused-arguments", "-target", "arm64-apple-macos15.0", "-isysroot", "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.1.sdk", "-g", "-O0", "-std=c++17", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/modules", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/include/operations", "-I/Users/siyuan/Dropbox/STUDY/efficient_ai/yuangine/params", "-o", "build/.objs/yuangine/macosx/arm64/debug/src/operations/bmm.cpp.o", "src/operations/bmm.cpp"],
+  "file": "src/operations/bmm.cpp"
 }]
