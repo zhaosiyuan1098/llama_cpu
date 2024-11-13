@@ -7,6 +7,7 @@
 #include "llamaForCausalLM_int4.h"
 #include "generate.h"
 
+
 std::map<std::string, int> model_config = {{"OPT_125m", OPT_125M}, {"OPT_1.3B", OPT_1_3B}, {"OPT_6.7B", OPT_6_7B}, {"LLaMA_7B", LLaMA_7B}, {"LLaMA_7B_AWQ", LLaMA_7B}, {"LLaMA_7B_2_chat", LLaMA_7B}};
 
 std::map<std::string, std::string> model_path = {

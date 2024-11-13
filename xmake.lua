@@ -7,11 +7,21 @@ target("yuangine")
     add_files("src/*.cpp")
     add_files("src/modules/*.cpp")
     add_files("src/operations/*.cpp")
+    add_files("kernel/*.cpp")
     add_includedirs("$(projectdir)/include")
     add_includedirs("$(projectdir)/include/modules")
     add_includedirs("$(projectdir)/include/operations")
     add_includedirs("$(projectdir)/params")
+    add_includedirs("$(projectdir)/kernel/")
+    
 
+    if is_arch("x86_64", "i386") then
+        add_defines("QM_x86")
+        add_cxxflags("-mavx2")
+    elseif is_arch("arm64", "arm") then
+        add_defines("QM_ARM")
+        add_cxflags("-mfpu=neon")
+    end
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

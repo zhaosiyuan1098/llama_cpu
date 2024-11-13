@@ -1,3 +1,6 @@
+#ifndef LINEAR_H
+#define LINEAR_H
+
 #include "common.h"
 #include"utlis.h"
 class Linear_FP {
@@ -60,3 +63,5 @@ class Linear_FP_int4 {
     std::string profile_name = "Unkown";
 #endif
 };
+
+#endif // LINEAR_H

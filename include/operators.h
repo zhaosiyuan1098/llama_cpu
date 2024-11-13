@@ -3,14 +3,14 @@
 #include <cassert>
 
 #include "common.h"
+#include "matmul.h"
 
-#include"linear.h"
-#include"embedding.h"
-#include"rotaryPosEmb.h"
-#include"bmm.h"
-#include"rmsNorm.h"
-#include"embedding.h"
-
+#include "linear.h"
+#include "embedding.h"
+#include "rotaryPosEmb.h"
+#include "bmm.h"
+#include "rmsNorm.h"
+#include "embedding.h"
 
 
 #define BLK_SIZE 16
@@ -23,4 +23,4 @@ void batch_Add(const Matrix3D<float> &input, const Matrix3D<float> &input2, Matr
 template <typename T>
 void linear(Matrix3D<T> &a, Matrix3D<T> &b, Matrix3D<T> &c);
 
-#endif  // OPERATORS_H
+#endif // OPERATORS_H

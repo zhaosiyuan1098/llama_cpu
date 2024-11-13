@@ -11,7 +11,32 @@ Int4LlamaForCausalLM::Int4LlamaForCausalLM(std::string param_path, const struct 
     std::cout << "Int4LlamaForCausalLM init finished!" << std::endl;
 }
 
-struct Int4LlamaForCausalLM_output Int4LlamaForCausalLM::forward(const struct Int4LlamaForCausalLM_input &input) {
-    struct Int4LlamaForCausalLM_output output;
-    return output;
+struct Int4LlamaForCausalLM_output Int4LlamaForCausalLM::forward(const struct Int4LlamaForCausalLM_input &input)
+{
+    PROFILE_START(profile_name);
+    int sqlen = input.input_ids.m_dim_z;
+
+    struct Int4llamaDecoder_output decoder_output;
+
+    // Call decoder
+    if (input.has_past_keys_values)
+    {
+        struct Int4llamaDecoder_input decoder_input = {input.input_ids, input.past_keys, input.past_values};
+        decoder_output = this->decoder.forward(decoder_input);
+    }
+    else
+    {
+        struct Int4llamaDecoder_input decoder_input = {input.input_ids};
+        decoder_output = this->decoder.forward(decoder_input);
+    }
+
+    // Get logits
+    Matrix3D<float> logits(logits_output, 1, sqlen, this->decoder.voc_size);
+    this->lm_head.forward(decoder_output.last_hidden_state, logits);
+
+    struct Int4LlamaForCausalLM_output LMoutput = {logits, decoder_output.past_keys, decoder_output.past_values};
+
+    
+    PROFILE_END(profile_name);
+    return LMoutput;
 }
