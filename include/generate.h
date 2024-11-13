@@ -83,3 +83,15 @@ void sample_top_p(OPT_token_data_array* candidates, float p, size_t min_keep);
 enum { OPT, LLaMA_FP32, LLaMA_INT4 };
 std::vector<int> LLaMAGenerate(void* model, int model_type, std::string text, const struct opt_params generation_config,
                                std::string voc_path, bool interactive);
+
+
+class Generator
+{
+private:
+    /* data */
+public:
+    Generator(/* args */);
+    ~Generator();
+};
+
+

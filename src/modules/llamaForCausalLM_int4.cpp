@@ -10,3 +10,8 @@ Int4LlamaForCausalLM::Int4LlamaForCausalLM(std::string param_path, const struct 
                                    param_path + "/lm_head");
     std::cout << "Int4LlamaForCausalLM init finished!" << std::endl;
 }
+
+struct Int4LlamaForCausalLM_output Int4LlamaForCausalLM::forward(const struct Int4LlamaForCausalLM_input &input) {
+    struct Int4LlamaForCausalLM_output output;
+    return output;
+}

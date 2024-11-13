@@ -95,8 +95,12 @@ int main(int argc, char **argv)
         std::cout << "Loading model... " << std::flush;
         int model_id = model_config[target_model];
         std::string m_path = model_path[target_model];
+        struct model_config model_config = get_opt_model_config(model_id);
+        
+        
 
         struct opt_params generation_config;
+        
         generation_config.n_predict = 512;
         generation_config.n_vocab = 32000;
         generation_config.temp = 0.1f;
@@ -139,8 +143,8 @@ int main(int argc, char **argv)
                 std::string input;
                 std::getline(std::cin, input);
                 input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
-
-                LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, "models/llama_vocab.bin", true);
+                std::string vocab_path = absolute_path + "/model/vocab/llama_vocab.bin" ;
+                LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, vocab_path, true);
             }
             break;
         }
