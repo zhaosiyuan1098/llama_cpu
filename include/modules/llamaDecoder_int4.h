@@ -1,3 +1,6 @@
+#ifndef LLAMA_DECODER
+#define LLAMA_DECODER
+
 #include "llamaDecoderlayer_int4.h"
 
 struct Int4llamaDecoder_output {
@@ -35,3 +38,5 @@ class Int4llamaDecoder {
     float* last_hidden_states_buf;
     float* hidden_states_buf;
 };
+
+#endif

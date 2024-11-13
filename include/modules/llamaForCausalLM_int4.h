@@ -1,3 +1,6 @@
+#ifndef LLAMAFORCAUSALLM
+#define LLAMAFORCAUSALLM
+
 #include "llamaDecoder_int4.h"
 
 struct Int4LlamaForCausalLM_output {
@@ -30,3 +33,6 @@ class Int4LlamaForCausalLM {
     float* logits_output;
     uint8_t* lm_head_weight;
 };
+
+
+#endif

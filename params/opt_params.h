@@ -1,3 +1,5 @@
+#ifndef OPT_PARAMS
+#define OPT_PARAMS
 #include <cstdint>
 #include<unordered_map>
 
@@ -27,3 +29,5 @@ struct opt_params {
     float mirostat_tau = 5.00f;                 // target entropy
     float mirostat_eta = 0.10f;                 // learning rate
 };
+
+#endif

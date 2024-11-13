@@ -1,3 +1,6 @@
+#ifndef LLAMA_DECODERLAYER
+#define LLAMA_DECODERLAYER
+
 #include "llamaAttention_int4.h"
 
 struct Int4llamaDecoderLayer_output
@@ -50,3 +53,5 @@ class Int4llamaDecoderLayer {
     Int4llamaAttention attn;
     std::string profile_name = "Int4llamaDecoderLayer";
 };
+
+#endif

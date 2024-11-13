@@ -5,7 +5,7 @@
 #include "utlis.h"
 #include "opt_params.h"
 #include "llamaForCausalLM_int4.h"
-
+#include "generate.h"
 
 std::map<std::string, int> model_config = {{"OPT_125m", OPT_125M}, {"OPT_1.3B", OPT_1_3B}, {"OPT_6.7B", OPT_6_7B}, {"LLaMA_7B", LLaMA_7B}, {"LLaMA_7B_AWQ", LLaMA_7B}, {"LLaMA_7B_2_chat", LLaMA_7B}};
 
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
                 std::getline(std::cin, input);
                 input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
 
-                // LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, "models/llama_vocab.bin", true);
+                LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, "models/llama_vocab.bin", true);
             }
             break;
         }

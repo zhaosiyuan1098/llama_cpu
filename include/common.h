@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "model.h"
+#include "opt_params.h"
 
 #define MAX_LINEAR_LENGTH 1024 * 1024 * 16  // 16MB, TO BE REMOVED with better memory allocation!
 #define DEBUG false

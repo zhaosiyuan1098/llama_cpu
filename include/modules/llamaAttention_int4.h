@@ -1,3 +1,6 @@
+#ifndef LLAMA_ATTENTION_INT4_H
+#define LLAMA_ATTENTION_INT4_H
+
 #include <utility>
 #include <cstdlib>
 #include <string>
@@ -49,3 +52,6 @@ class Int4llamaAttention {
     BMM_F32T qk_bmm, pv_bmm;
     std::string profile_name = "Int4llamaAttention";
 };
+
+
+#endif 
