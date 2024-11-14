@@ -1,3 +1,6 @@
+#ifndef BMM_H
+#define BMM_H
+
 #include"common.h"
 
 class BMM_F32T {
@@ -11,3 +14,5 @@ class BMM_F32T {
    private:
     std::string profile_name = "BMM_F32T";
 };
+
+#endif

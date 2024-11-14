@@ -69,10 +69,10 @@ struct Int4llamaDecoderLayer_output Int4llamaDecoderLayer::forward(const struct 
                                   input.hidden_states.m_dim_z);
     this->input_layernorm.forward(input.hidden_states, hidden_states);
 
-    // // Attention
-    // struct Int4llamaAttention_input attn_param(hidden_states, input.attention_mask, input.past_key, input.past_value,
-    //                                            input.has_past_key_value, this->layer_idx);
-    // struct Int4llamaAttention_output attn_output = this->attn.forward(attn_param);
+    // Attention
+    struct Int4llamaAttention_input attn_param(hidden_states, input.attention_mask, input.past_key, input.past_value,
+                                               input.has_past_key_value, this->layer_idx);
+    struct Int4llamaAttention_output attn_output = this->attn.forward(attn_param);
 
     // // Residual add
     // Matrix3D<float> residual_add(hidden_states_float_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y,
