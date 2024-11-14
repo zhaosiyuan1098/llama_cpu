@@ -16,6 +16,9 @@ struct Int4llamaDecoderLayer_output
         attentions = attentions_;
         past_key_value = past_key_value_;
     };
+    Int4llamaDecoderLayer_output(){
+        std::cout << "Int4llamaDecoderLayer_output origin init finished!" << std::endl;
+    };
 };
 struct Int4llamaDecoderLayer_input
 {

@@ -3,6 +3,7 @@
 
 #include"common.h"
 #include<cassert>
+#include"utlis.h"
 
 
 class Embedding {

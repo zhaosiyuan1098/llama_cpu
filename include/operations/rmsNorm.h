@@ -1,3 +1,6 @@
+#ifndef RMSNORM_H
+#define RMSNORM_H
+
 #include"common.h"
 
 class LlamaRMSNorm {
@@ -11,3 +14,5 @@ class LlamaRMSNorm {
    private:
     std::string profile_name = "LlamaRMSNorm";
 };
+
+#endif

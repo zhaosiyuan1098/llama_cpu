@@ -38,52 +38,68 @@ Int4llamaDecoder::Int4llamaDecoder(std::string param_path, const struct model_co
 }
 
 struct Int4llamaDecoder_output Int4llamaDecoder::forward(const struct Int4llamaDecoder_input &input) {
-    // PROFILE_START(profile_name);
-    // int sqlen = input.input_ids.m_dim_z, batch_size = input.input_ids.m_dim_x, past_key_values_length = 0;
+    PROFILE_START(profile_name);
+    int sqlen = input.input_ids.m_dim_z, batch_size = input.input_ids.m_dim_x, past_key_values_length = 0;
 
-    // // Input token -> Embedding
-    // float inputs_embeds_buf[sqlen * this->embed_dim];
-    // Matrix3D<float> inputs_embeds(inputs_embeds_buf, 1, sqlen, this->embed_dim);
-    // this->embed_tokens.forward(input.input_ids, inputs_embeds);
+    // Input token -> Embedding
+    float inputs_embeds_buf[sqlen * this->embed_dim];
+    Matrix3D<float> inputs_embeds(inputs_embeds_buf, 1, sqlen, this->embed_dim);
+    this->embed_tokens.forward(input.input_ids, inputs_embeds);
 
-    // if (input.has_past_keys_values) {
-    //     past_key_values_length = input.past_keys[0].m_dim_y;
-    // }
+    if (input.has_past_keys_values) {
+        past_key_values_length = input.past_keys[0].m_dim_y;
+    }
 
-    // // Attention mask
-    // Matrix3D<float> causal_attention_mask =
-    //     this->prepare_decoder_attention_mask(sqlen + past_key_values_length, past_key_values_length);
+    // Attention mask
+    Matrix3D<float> causal_attention_mask =
+        this->prepare_decoder_attention_mask(sqlen + past_key_values_length, past_key_values_length);
 
-    // // Go through each layer
-    // Matrix3D<float> hidden_states = inputs_embeds;
-    // std::vector<Matrix3D<float>> past_keys, past_values;
-    // for (int i = 0; i < this->layers.size(); i++) {
-    //     if (!input.has_past_keys_values) {
-    //         struct Int4llamaDecoderLayer_input l_i = {hidden_states, causal_attention_mask};
-    //         struct Int4llamaDecoderLayer_output l_o = this->layers[i].forward(l_i);
-    //         hidden_states = l_o.hidden_states;
-    //         past_keys.push_back(l_o.past_key_value.first);
-    //         past_values.push_back(l_o.past_key_value.second);
-    //     } else {
-    //         struct Int4llamaDecoderLayer_input l_i = {hidden_states, causal_attention_mask, input.past_keys[i],
-    //                                                   input.past_values[i]};
-    //         struct Int4llamaDecoderLayer_output l_o = this->layers[i].forward(l_i);
-    //         hidden_states = l_o.hidden_states;
-    //         past_keys.push_back(l_o.past_key_value.first);
-    //         past_values.push_back(l_o.past_key_value.second);
-    //     }
-    // }
+    // Go through each layer
+    Matrix3D<float> hidden_states = inputs_embeds;
+    std::vector<Matrix3D<float>> past_keys, past_values;
+    for (int i = 0; i < this->layers.size(); i++) {
+        if (!input.has_past_keys_values) {
+            struct Int4llamaDecoderLayer_input l_i = {hidden_states, causal_attention_mask};
+            struct Int4llamaDecoderLayer_output l_o = this->layers[i].forward(l_i);
+            hidden_states = l_o.hidden_states;
+            past_keys.push_back(l_o.past_key_value.first);
+            past_values.push_back(l_o.past_key_value.second);
+        } else {
+            struct Int4llamaDecoderLayer_input l_i = {hidden_states, causal_attention_mask, input.past_keys[i],
+                                                      input.past_values[i]};
+            struct Int4llamaDecoderLayer_output l_o = this->layers[i].forward(l_i);
+            hidden_states = l_o.hidden_states;
+            past_keys.push_back(l_o.past_key_value.first);
+            past_values.push_back(l_o.past_key_value.second);
+        }
+    }
 
-    // // Layernorm
-    // Matrix3D<float> last_hidden_states(last_hidden_states_buf, 1, sqlen, this->embed_dim);
-    // this->norm.forward(hidden_states, last_hidden_states);
+    // Layernorm
+    Matrix3D<float> last_hidden_states(last_hidden_states_buf, 1, sqlen, this->embed_dim);
+    this->norm.forward(hidden_states, last_hidden_states);
 
-    // struct Int4llamaDecoder_output output = {last_hidden_states, past_keys, past_values};
-    struct Int4llamaDecoder_output output;
-    {
-        /* data */
-    };
+    struct Int4llamaDecoder_output output = {last_hidden_states, past_keys, past_values};
     
     PROFILE_END(profile_name);
     return output;
+}
+
+
+Matrix3D<float> Int4llamaDecoder::prepare_decoder_attention_mask(int length, int past_length) {
+    PROFILE_START("Int4llamaDecoder::prepare_decoder_attention_mask");
+    assert(length - past_length > 0);
+    Matrix3D<float> causal_attention_mask(attention_mask_buf, 1, length - past_length, length);
+    float min = std::numeric_limits<float>::lowest();
+    for (int i = 0; i < length - past_length; i++) {
+        for (int j = 0; j < length; j++) {
+            if (i + past_length < j) {
+                causal_attention_mask(0, i, j) = min;
+            } else {
+                causal_attention_mask(0, i, j) = 0.0;
+            }
+        }
+    }
+
+    PROFILE_END("Int4llamaDecoder::prepare_decoder_attention_mask");
+    return causal_attention_mask;
 }

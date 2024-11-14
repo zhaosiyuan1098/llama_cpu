@@ -41,7 +41,7 @@ class Int4llamaAttention {
     Int4llamaAttention(std::string param_path, const struct model_config config);
     Int4llamaAttention() {}
     static void allocate_memory(const struct model_config config);
-    // struct Int4llamaAttention_output forward(const struct Int4llamaAttention_input &input);
+    struct Int4llamaAttention_output forward(const struct Int4llamaAttention_input &input);
 
    private:
     void unshape(Matrix3D<float> shaped, Matrix3D<float> unshape, int sqlen);
