@@ -18,10 +18,26 @@
     git clone https://github.com/zhaosiyuan1098/yuangine.git
     cd yuangine
     ```
+
 3. 下载所需模型：
     ```bash
+    
     cd ./model
-    python download_model.py --model LLaMA_7B_2_chat --QM QM_ARM
+    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/vu7wnes1c7gkcegg854ys/LLaMA_7B_2_chat.zip?rlkey=q61o8fpc954g1ke6g2eaot7cf&dl=1"
+    unzip LLaMA_7B_2_chat.zip
+
+    ```
+
+    也可使用python下载其他模型
+      ```bash
+    
+    conda create -n yuangine python=3.10
+    conda activate yuangine
+    pip install -r requirenments.txt
+    cd ./model
+
+    python download_model.py --model 想要下载的模型名 --QM 对应的架构
+
     ```
 3. 编译项目：
     ```bash
