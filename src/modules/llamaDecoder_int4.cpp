@@ -34,7 +34,7 @@ Int4llamaDecoder::Int4llamaDecoder(std::string param_path, const struct model_co
 
         this->layers.push_back(layer);
     }
-    std::cout << "Int4llamaDecoder init finished!" << std::endl;
+    std::cout << "Decoder init finished" << std::endl;
 }
 
 struct Int4llamaDecoder_output Int4llamaDecoder::forward(const struct Int4llamaDecoder_input &input) {

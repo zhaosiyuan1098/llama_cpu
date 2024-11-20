@@ -109,25 +109,6 @@ int main(int argc, char **argv)
 
         switch (format_id)
         {
-        case FP32:
-        {
-            std::cout << m_path << std::endl;
-            // Fp32llamaAttention a = Fp32llamaAttention(m_path, get_opt_model_config(model_id));
-            // Fp32LlamaForCausalLM model = Fp32LlamaForCausalLM(m_path, get_opt_model_config(model_id));
-            std::cout << "Finished!" << std::endl;
-
-            // Get input from the user
-            while (true)
-            {
-                std::cout << "USER: ";
-                std::string input;
-                std::getline(std::cin, input);
-                input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
-
-                // LLaMAGenerate(&model, LLaMA_FP32, input, generation_config, "models/llama_vocab.bin", true);
-            }
-            break;
-        }
         case INT4:
         {
             std::string current_path = std::filesystem::current_path().string();
@@ -135,7 +116,7 @@ int main(int argc, char **argv)
             std::string m_path = absolute_path + "/model/INT4/" + model_path[target_model];
             std::cout << "Loading model from path: " << m_path << std::endl;
             Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, get_opt_model_config(model_id));
-            std::cout << "Finished!" << std::endl;
+            std::cout << "All load Finished! now you can chat with llm in the terminal~" << std::endl;
 
             // Get input from the user
             while (true)

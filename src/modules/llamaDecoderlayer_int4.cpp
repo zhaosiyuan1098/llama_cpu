@@ -56,7 +56,7 @@ Int4llamaDecoderLayer::Int4llamaDecoderLayer(std::string param_path, const struc
                                      (param_path + "/down_proj"));
     this->up_proj = Linear_FP_int4(Matrix3D<uint8_t>(up_proj_weight, 1, config.hidden_dim, config.embed_dim / 2),
                                    (param_path + "/up_proj"));
-    std::cout << "Int4llamaDecoderLayer init finished! Layer index: " << layer_idx << std::endl;
+    std::cout << "DecoderLayer  " << layer_idx <<"  init finished"<< std::endl;
     }
 
 void Int4llamaDecoderLayer::allocate_memory(const struct model_config config) {
