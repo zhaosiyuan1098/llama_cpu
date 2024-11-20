@@ -20,24 +20,34 @@
     ```
 
 3. 下载所需模型：
+* 使用curl下载
     ```bash
     
     cd ./model
-    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/vu7wnes1c7gkcegg854ys/LLaMA_7B_2_chat.zip?rlkey=q61o8fpc954g1ke6g2eaot7cf&dl=1"
-    unzip LLaMA_7B_2_chat.zip
 
     ```
 
-    也可使用python下载其他模型
-      ```bash
-    
+    * x86:
+    ```bash
+    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/vu7wnes1c7gkcegg854ys/LLaMA_7B_2_chat.zip?rlkey=q61o8fpc954g1ke6g2eaot7cf&dl=1"
+    ```
+    * ARM:
+    ```bash
+    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/1trpw92vmh4czvl28hkv0/LLaMA_7B_2_chat.zip?rlkey=dy1pdek0147gnuxdzpodi6pkt&dl=1"
+    ```
+    解压
+    ```bash
+    unzip LLaMA_7B_2_chat.zip
+    ```
+
+* 使用python下载其他模型（可选）
+    ```bash
     conda create -n yuangine python=3.10
     conda activate yuangine
     pip install -r requirenments.txt
     cd ./model
 
     python download_model.py --model 想要下载的模型名 --QM 对应的架构
-
     ```
 3. 编译项目：
     ```bash
