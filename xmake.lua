@@ -15,7 +15,12 @@ target("yuangine")
     add_includedirs("$(projectdir)/kernel/")
     
 --linear层乘法实现方式
-    add_defines("IMP=5")
+-- 0 最原始的实现
+-- 1 循环展开
+-- 2 多线程
+-- 3 simd
+-- 4 使用多线程+simd+循环展开加速
+    add_defines("IMP=4")
 
     if is_arch("x86_64", "i386") then
         add_defines("QM_x86")

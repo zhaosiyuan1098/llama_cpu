@@ -81,8 +81,6 @@ void Linear_FP_int4::forward(const Matrix3D<float> &x, Matrix3D<float> &output) 
 #elif IMP == 3
     op.mat_mul_simd_programming(&params);
 #elif IMP == 4
-    op.mat_mul_multithreading_loop_unrolling(&params);
-#elif IMP == 5
     op.mat_mul_all_techniques(&params);
 #else
     printf("Implementation not specified\n");

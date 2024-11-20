@@ -1,0 +1,65 @@
+.
+├── README.md
+├── include 
+│   ├── common.h
+│   ├── generate.h
+│   ├── llamaTokenizer.h
+│   ├── model.h
+│   ├── modules
+│   │   ├── llamaAttention_fp32.h
+│   │   ├── llamaAttention_int4.h
+│   │   ├── llamaDecoder_fp32.h
+│   │   ├── llamaDecoder_int4.h
+│   │   ├── llamaDecoderlayer_fp32.h
+│   │   ├── llamaDecoderlayer_int4.h
+│   │   ├── llamaForCausalLM_fp32.h
+│   │   └── llamaForCausalLM_int4.h
+│   ├── operations
+│   │   ├── bmm.h
+│   │   ├── embedding.h
+│   │   ├── linear.h
+│   │   ├── rmsNorm.h
+│   │   └── rotaryPosEmb.h
+│   ├── operators.h
+│   ├── profiler.h
+│   └── utlis.h
+├── kernel:乘法的主要实现
+│   ├── matmul.cpp
+│   ├── matmul.h
+│   ├── matmul_multithread.cpp
+│   ├── matmul_simd.cpp
+│   ├── matmul_speedup.cpp
+│   ├── matmul_unrolling.cpp
+│   └── quantizer.cpp
+├── params：保存所需参数
+│   └── opt_params.h
+├── pic
+│   ├── llama2_structure.png
+│   └── test.png
+├── src
+│   ├── generate.cpp
+│   ├── llamaGenerate.cpp
+│   ├── llamaTokenlizer.cpp
+│   ├── main.cpp
+│   ├── modules：llama的核心组成成分
+│   │   ├── llamaAttention_fp32.cpp
+│   │   ├── llamaAttention_int4.cpp
+│   │   ├── llamaDecoder_fp32.cpp
+│   │   ├── llamaDecoder_int4.cpp
+│   │   ├── llamaDecoderlayer_fp32.cpp
+│   │   ├── llamaDecoderlayer_int4.cpp
+│   │   ├── llamaForCausalLM_fp32.cpp
+│   │   └── llamaForCausalLM_int4.cpp
+│   ├── operations：算子实现
+│   │   ├── batch_add.cpp
+│   │   ├── bmm.cpp
+│   │   ├── embedding.cpp
+│   │   ├── linear.cpp
+│   │   ├── rmsNorm.cpp
+│   │   ├── rotaryPosEmb.cpp
+│   │   └── softmax.cpp
+│   └── utlis.cpp
+├── structure.txt
+└── xmake.lua：编译规则
+
+10 directories, 53 files
