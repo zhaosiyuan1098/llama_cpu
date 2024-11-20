@@ -11,3 +11,7 @@
 ## 结构
 
 ![](./pic/llama2_structure.png)
+
+## 效果展示
+
+![](./pic/test.png)

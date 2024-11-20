@@ -14,10 +14,12 @@ target("yuangine")
     add_includedirs("$(projectdir)/params")
     add_includedirs("$(projectdir)/kernel/")
     
+--linear层乘法实现方式
+    add_defines("IMP=5")
 
     if is_arch("x86_64", "i386") then
         add_defines("QM_x86")
-        add_cxxflags("-mavx2")
+        add_cxxflags("-mavx2", "-mfma")
     elseif is_arch("arm64", "arm") then
         add_defines("QM_ARM")
         add_cxflags("-mfpu=neon")

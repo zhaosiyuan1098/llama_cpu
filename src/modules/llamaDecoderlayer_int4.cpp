@@ -10,6 +10,16 @@ static float *temp;
 static float *hidden_states_arr;
 
 
+static void SiLuMul(Matrix3D<float> a, Matrix3D<float> b) {
+    PROFILE_START("Int4llamaDecoderLayer::MulSiLu");
+    for (int i = 0; i < a.length(); i++) {
+        float v = a.m_data[i];
+        float silu_v = v * (1.0 / (1.0 + exp(-1 * v)));
+        a.m_data[i] = silu_v * b.m_data[i];
+    }
+    PROFILE_END("Int4llamaDecoderLayer::MulSiLu");
+}
+
 Int4llamaDecoderLayer::Int4llamaDecoderLayer(std::string param_path, const struct model_config config, int layer_idx) {
     if(layer_idx==0){
         this->allocate_memory(config);
@@ -59,9 +69,20 @@ void Int4llamaDecoderLayer::allocate_memory(const struct model_config config) {
     allocate_aligned_memory(hidden_states_arr, config.max_sqlen * config.embed_dim * sizeof(float));
 }
 
+template <typename T>
+static void add(Matrix3D<T> a, Matrix3D<T> b, Matrix3D<T> c) {
+    PROFILE_START("Int4llamaDecoderLayer::add");
+    assert(c.length() == a.length() && a.length() == b.length());
+
+    for (int i = 0; i < a.length(); i++) {
+        c.m_data[i] = a.m_data[i] + b.m_data[i];
+    }
+    PROFILE_END("Int4llamaDecoderLayer::add");
+}
+
 struct Int4llamaDecoderLayer_output Int4llamaDecoderLayer::forward(const struct Int4llamaDecoderLayer_input &input) {
-    std::cout << "Int4llamaDecoderLayer forward!" << std::endl;
-    struct Int4llamaDecoderLayer_output output;
+    // std::cout << "Int4llamaDecoderLayer forward!" << std::endl;
+    // struct Int4llamaDecoderLayer_output output;
     
     PROFILE_START(profile_name);
     // Layernorm
@@ -74,37 +95,37 @@ struct Int4llamaDecoderLayer_output Int4llamaDecoderLayer::forward(const struct 
                                                input.has_past_key_value, this->layer_idx);
     struct Int4llamaAttention_output attn_output = this->attn.forward(attn_param);
 
-    // // Residual add
-    // Matrix3D<float> residual_add(hidden_states_float_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y,
-    //                              input.hidden_states.m_dim_z);
-    // add(input.hidden_states, attn_output.attn_output, residual_add);
+    // Residual add
+    Matrix3D<float> residual_add(hidden_states_float_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y,
+                                 input.hidden_states.m_dim_z);
+    add(input.hidden_states, attn_output.attn_output, residual_add);
 
-    // // Layernorm
-    // Matrix3D<float> post_attention_layernorm(final_layer_norm_arr, input.hidden_states.m_dim_x,
-    //                                          input.hidden_states.m_dim_y, input.hidden_states.m_dim_z);
-    // this->post_attention_layernorm.forward(residual_add, post_attention_layernorm);
+    // Layernorm
+    Matrix3D<float> post_attention_layernorm(final_layer_norm_arr, input.hidden_states.m_dim_x,
+                                             input.hidden_states.m_dim_y, input.hidden_states.m_dim_z);
+    this->post_attention_layernorm.forward(residual_add, post_attention_layernorm);
 
-    // // Gate proj: embedding -> hidden_dim
-    // Matrix3D<float> gate_proj(gate_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y,
-    //                           this->hidden_dim);
-    // this->gate_proj.forward(post_attention_layernorm, gate_proj);
+    // Gate proj: embedding -> hidden_dim
+    Matrix3D<float> gate_proj(gate_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y,
+                              this->hidden_dim);
+    this->gate_proj.forward(post_attention_layernorm, gate_proj);
 
-    // // up proj: embedding -> hidden_dim
-    // Matrix3D<float> up_proj(up_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y, this->hidden_dim);
-    // this->up_proj.forward(post_attention_layernorm, up_proj);
+    // up proj: embedding -> hidden_dim
+    Matrix3D<float> up_proj(up_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y, this->hidden_dim);
+    this->up_proj.forward(post_attention_layernorm, up_proj);
 
-    // // silu
-    // SiLuMul(gate_proj, up_proj);
+    // silu
+    SiLuMul(gate_proj, up_proj);
 
-    // // down proj: hidden_dim -> embedding
-    // Matrix3D<float> down_proj(down_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y, this->embed_dim);
-    // this->down_proj.forward(gate_proj, down_proj);
+    // down proj: hidden_dim -> embedding
+    Matrix3D<float> down_proj(down_proj_arr, input.hidden_states.m_dim_x, input.hidden_states.m_dim_y, this->embed_dim);
+    this->down_proj.forward(gate_proj, down_proj);
 
-    // // Residual add
-    // add(residual_add, down_proj, residual_add);
+    // Residual add
+    add(residual_add, down_proj, residual_add);
 
-    // struct Int4llamaDecoderLayer_output output(residual_add, attn_output.attn_probs_reshaped,
-    //                                            attn_output.past_key_value);
-    // PROFILE_END(profile_name);
+    struct Int4llamaDecoderLayer_output output(residual_add, attn_output.attn_probs_reshaped,
+                                               attn_output.past_key_value);
+    PROFILE_END(profile_name);
     return output;
 }

@@ -1,5 +1,5 @@
-#ifndef LLAMA_DECODERLAYER
-#define LLAMA_DECODERLAYER
+#ifndef LLAMA_DECODERLAYER_INT4
+#define LLAMA_DECODERLAYER_INT4
 
 #include "llamaAttention_int4.h"
 

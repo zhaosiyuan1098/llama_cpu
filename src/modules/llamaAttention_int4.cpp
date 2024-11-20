@@ -147,10 +147,12 @@ struct Int4llamaAttention_output Int4llamaAttention::forward(const struct Int4ll
 {
     PROFILE_START(profile_name);
     struct Int4llamaAttention_output output;
+    //b为batc_size,b=1表示一次只处理一个句子
     const int sqlen = input.hidden_states.m_dim_y, b = input.hidden_states.m_dim_x;
     assert(b == 1);
 
     // Query states
+    //embed_dim为词向量维度,llama中为4096
     Matrix3D<float> query_states_unshape(query_states_unshape_arr, b, sqlen, embed_dim);
     this->q_proj.forward(input.hidden_states, query_states_unshape);
     Matrix3D<float> query_states(query_states_arr, this->num_heads, sqlen, this->head_dim);
@@ -168,6 +170,7 @@ struct Int4llamaAttention_output Int4llamaAttention::forward(const struct Int4ll
     {
         ret_value_states = value_states_arr_cache[input.layer_idx][0];
         ret_key_states = key_states_arr_cache[input.layer_idx][0];
+        //表示该层的缓存已被使用一次
         cache_num[input.layer_idx] = 1;
     }
 
