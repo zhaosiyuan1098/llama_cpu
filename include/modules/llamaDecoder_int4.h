@@ -23,7 +23,7 @@ struct Int4llamaDecoder_input {
 class Int4llamaDecoder {
    public:
     Int4llamaDecoder(std::string param_path, const struct model_config config);
-    Int4llamaDecoder(){};
+    Int4llamaDecoder() {};
     Matrix3D<float> prepare_decoder_attention_mask(int length, int past_length);
     struct Int4llamaDecoder_output forward(const struct Int4llamaDecoder_input& input);
     Embedding embed_tokens;
