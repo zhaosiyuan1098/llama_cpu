@@ -19,12 +19,9 @@ Int4llamaDecoder::Int4llamaDecoder(std::string param_path, const struct model_co
     Matrix3D<float> embweight(new float[voc_size * embed_dim], 1, voc_size, embed_dim);
     this->embed_tokens = Embedding(embed_dim, voc_size, padding_idx, embweight);
     load_Embedding_params(this->embed_tokens, param_path + "/embed_tokens");
+    std::cout << "Embedding init finished" << std::endl;
 
-    // Norm
-    Matrix3D<float> norm_weight(new float[embed_dim], 1, 1, embed_dim);
-    norm_weight.load((param_path + "/norm/weight.bin").c_str());
-    this->norm = LlamaRMSNorm(norm_weight);
-
+    
     // Load all the decoder layers
     for (int layer_idx = 0; layer_idx < config.num_layers; layer_idx++) {
         DEBUG_INS(std::cout << "Start loading layer:" << layer_idx << "..." << std::endl;)
@@ -34,6 +31,14 @@ Int4llamaDecoder::Int4llamaDecoder(std::string param_path, const struct model_co
 
         this->layers.push_back(layer);
     }
+    std::cout << "Decoder init finished" << std::endl;
+
+    // Norm
+    Matrix3D<float> norm_weight(new float[embed_dim], 1, 1, embed_dim);
+    norm_weight.load((param_path + "/norm/weight.bin").c_str());
+    this->norm = LlamaRMSNorm(norm_weight);
+    std::cout << "Norm init finished" << std::endl;
+
     std::cout << "Decoder init finished" << std::endl;
 }
 

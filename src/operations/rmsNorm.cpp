@@ -1,31 +1,37 @@
-#include"rmsNorm.h"
+#include "rmsNorm.h"
 
 #include "operators.h"
 #include "utlis.h"
 
-void LlamaRMSNorm::forward(const Matrix3D<float> &x, Matrix3D<float> &output) {
+void LlamaRMSNorm::forward(const Matrix3D<float> &x, Matrix3D<float> &output)
+{
     PROFILE_START(profile_name);
     const int last_dims = 2;
 
-    assert(last_dims == 2);  // support the last dim for now
+    assert(last_dims == 2); // support the last dim for now
     assert(output.m_dim_x == x.m_dim_x);
     assert(output.m_dim_y == x.m_dim_y);
     assert(output.m_dim_z == x.m_dim_z);
     assert(x.m_dim_z == weight.m_dim_z);
 
-    for (int i = 0; i < x.m_dim_x; i++) {      // batches
-        for (int j = 0; j < x.m_dim_y; j++) {  // samples
-            float var = 0;
+    for (int i = 0; i < x.m_dim_x; i++)
+    { // batches
+        for (int j = 0; j < x.m_dim_y; j++)
+        { // samples
+            float rms = 0;
 
-            for (int k = 0; k < x.m_dim_z; k++) {  // hideden states
-                var += x(i, j, k) * x(i, j, k);
+            // Step 1: Compute RMS
+            for (int k = 0; k < x.m_dim_z; k++)
+            { // hidden states
+                rms += x(i, j, k) * x(i, j, k);
             }
-            var /= static_cast<float>(x.m_dim_z);
-            float variance = 1.0 / sqrt(var + eps);
+            rms = sqrt(rms / static_cast<float>(x.m_dim_z) + eps);
 
-            for (int k = 0; k < x.m_dim_z; k++) {
+            // Step 2: Normalize and apply the weight
+            for (int k = 0; k < x.m_dim_z; k++)
+            {
                 float value = static_cast<float>(x(i, j, k));
-                float fp_out = (value * variance) * weight(0, 0, k);
+                float fp_out = (value / rms) * weight(0, 0, k); // Apply normalization and scaling
                 output(i, j, k) = fp_out;
             }
         }

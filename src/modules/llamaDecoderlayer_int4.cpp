@@ -31,13 +31,17 @@ Int4llamaDecoderLayer::Int4llamaDecoderLayer(std::string param_path, const struc
     this->hidden_dim = config.hidden_dim;
     this->layer_idx = layer_idx;
 
-    this->attn = Int4llamaAttention(param_path + "/self_attn", config);
 
     float *input_layernorm_weight_ptr;
     allocate_aligned_memory(input_layernorm_weight_ptr, config.embed_dim * sizeof(float));
     Matrix3D<float> input_layernorm_weight(input_layernorm_weight_ptr, 1, 1, config.embed_dim);
     input_layernorm_weight.load((param_path + "/input_layernorm/weight.bin").c_str());
     this->input_layernorm = LlamaRMSNorm(input_layernorm_weight);
+
+    
+    this->attn = Int4llamaAttention(param_path + "/self_attn", config);
+
+    
 
     float *post_attention_layernorm_ptr;
     allocate_aligned_memory(post_attention_layernorm_ptr, config.embed_dim * sizeof(float));
@@ -52,10 +56,11 @@ Int4llamaDecoderLayer::Int4llamaDecoderLayer(std::string param_path, const struc
     allocate_aligned_memory(up_proj_weight, (config.embed_dim * config.hidden_dim * sizeof(uint8_t)) / 2);
     this->gate_proj = Linear_FP_int4(Matrix3D<uint8_t>(gate_proj_weight, 1, config.hidden_dim, config.embed_dim / 2),
                                      (param_path + "/gate_proj"));
-    this->down_proj = Linear_FP_int4(Matrix3D<uint8_t>(down_proj_weight, 1, config.embed_dim, config.hidden_dim / 2),
-                                     (param_path + "/down_proj"));
     this->up_proj = Linear_FP_int4(Matrix3D<uint8_t>(up_proj_weight, 1, config.hidden_dim, config.embed_dim / 2),
                                    (param_path + "/up_proj"));
+    this->down_proj = Linear_FP_int4(Matrix3D<uint8_t>(down_proj_weight, 1, config.embed_dim, config.hidden_dim / 2),
+                                     (param_path + "/down_proj"));
+    
     std::cout << "DecoderLayer  " << layer_idx <<"  init finished"<< std::endl;
     }
 

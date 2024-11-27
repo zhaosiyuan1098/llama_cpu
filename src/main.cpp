@@ -97,15 +97,12 @@ int main(int argc, char **argv)
         int model_id = model_config[target_model];
         std::string m_path = model_path[target_model];
         struct model_config model_config = get_opt_model_config(model_id);
-        
-        
-
         struct opt_params generation_config;
         
-        generation_config.n_predict = 512;
-        generation_config.n_vocab = 32000;
-        generation_config.temp = 0.1f;
-        generation_config.repeat_penalty = 1.25f;
+        // generation_config.n_predict = 512;
+        // generation_config.n_vocab = 32000;
+        // generation_config.temp = 0.1f;
+        // generation_config.repeat_penalty = 1.25f;
 
         switch (format_id)
         {
@@ -115,7 +112,7 @@ int main(int argc, char **argv)
             std::string absolute_path = current_path.substr(0, current_path.find("/build"));
             std::string m_path = absolute_path + "/model/INT4/" + model_path[target_model];
             std::cout << "Loading model from path: " << m_path << std::endl;
-            Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, get_opt_model_config(model_id));
+            Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, model_config);
             std::cout << "All load Finished! now you can chat with llm in the terminal~" << std::endl;
 
             // Get input from the user
