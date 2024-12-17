@@ -56,25 +56,11 @@ struct thread_args {
 namespace matmul {
 class MatmulOperator {
    public:
+   
     void mat_mul_transposed(const struct matmul_params *params);
-    void mat_mul_accelerator_transposed_fastover_column(const struct matmul_params *params);
-    // int8
-    void naive_mat_mul_int8(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_32unroll_over_column(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_nobias(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_nobias_batch(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_nobias_ofp32(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_nobias_ofp32_batch(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_bfp32_ofp32(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_fast_2x2_32unroll_bfp32_ofp32_over_column(const struct matmul_params *params);
-    // int4
-    void mat_mul_accelerator_int4_fast(const struct matmul_params *params);
-    void mat_mul_accelerator_int4_fast_no_offset(const struct matmul_params *params);
-    void mat_mul_accelerator_int8_int4_fast_no_offset(struct matmul_params *params);
-    void naive_mat_mul_int4(const struct matmul_params *params);
-    void naive_mat_mul_int4_with_offset(const struct matmul_params *params);
-    // w8a4 code template functions
+    void mat_mul_transposed_all_techniques(struct matmul_params *params);
+
+    // w4a8 code functions
     void mat_mul_reference(struct matmul_params *params);
     void mat_mul_loop_unrolling(struct matmul_params *params);
     void mat_mul_multithreading(struct matmul_params *params);

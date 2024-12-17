@@ -38,8 +38,13 @@ void BMM_F32T::forward(const Matrix3D<float> &a, const Matrix3D<float> &weight, 
         //     op.mat_mul_transposed_fastover_column((const struct matmul_params
         //     *)&params);
         // else
-        op.mat_mul_transposed(&params);  // TODO: optimize this
+// #if IMP == 4
+//         op.mat_mul_transposed_all_techniques(&params);  // TODO: optimize this
+// #else
+//         op.mat_mul_transposed(&params);
+// #endif
         // TODO: apply SIMD here
+        op.mat_mul_transposed(&params);
         for (int i = 0; i < m * n; i++) {
             params.C.data_ptr[i] *= this->alpha;
         }

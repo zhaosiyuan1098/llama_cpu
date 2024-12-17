@@ -130,7 +130,7 @@ int main(int argc, char **argv)
         default:
         {
             std::cout << std::endl;
-            std::cerr << "At this time, we only support FP32 and INT4 for LLaMA7B." << std::endl;
+            std::cerr << "only support INT4 for LLaMA7B." << std::endl;
             break;
         }
         }

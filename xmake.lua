@@ -13,6 +13,7 @@ target("yuangine")
     add_includedirs("$(projectdir)/include/operations")
     add_includedirs("$(projectdir)/params")
     add_includedirs("$(projectdir)/kernel/")
+    add_links("pthread")
     
 --linear层乘法实现方式
 -- 0 最原始的实现

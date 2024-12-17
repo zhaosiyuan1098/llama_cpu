@@ -100,11 +100,12 @@ namespace matmul
                 float *sa_ptr = &params->A_scales[row * k / 32];
 
                 const int num_block = k / block_size;
+                const __m256i low_mask = _mm256_set1_epi8(0x0F);
                 // Compute two blocks in each iteration
                 for (int q = 0; q < num_block; q += 2)
                 {
                     // lowbit mask
-                    const __m256i lowMask = _mm256_set1_epi8(0xF);
+                    // const __m256i lowMask = _mm256_set1_epi8(0xF);
 
                     /*
                        We will accelerate the program using x86 Intrinsics. You can check the documentation of operations
@@ -117,7 +118,6 @@ namespace matmul
 
                     // step (1)
                     __m256i raw_w = _mm256_loadu_si256(w_start);
-                    __m256i low_mask = _mm256_set1_epi8(0x0F); // [low] 11110000... [high]
 
                     // step (2)
                     __m256i low_half_weight = _mm256_and_si256(raw_w, low_mask);

@@ -142,10 +142,11 @@ static void *all_techniques_worker_func(void *args)
             const __m256i *w_start = (__m256i *)&B->int4_data_ptr[col * k / 2];
             const __m256i *a_start = (__m256i *)&A->int8_data_ptr[row * k];
             const int num_block = k / block_size;
+            const __m256i lowMask = _mm256_set1_epi8(0xF);
 
             for (int q = 0; q < num_block; q += 4)
             {
-                const __m256i lowMask = _mm256_set1_epi8(0xF);
+                
 
                 __m256i raw_w = _mm256_loadu_si256(w_start);
                 __m256i raw_w_next = _mm256_loadu_si256(w_start + 1);
@@ -220,6 +221,38 @@ static void *all_techniques_worker_func(void *args)
     return NULL;
 }
 
+struct w4a8_thread_args_transposed
+{
+    int start_i, end_i;
+    const struct matmul_params *params;
+};
+
+
+//TODO
+static void *all_techniques_worker_func_transposed(void *args)
+{
+    struct w4a8_thread_args_transposed *mat_args = (struct w4a8_thread_args_transposed *)args;
+    const struct matmul_params *params = mat_args->params;
+    const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
+    int n = params->C.column, m = params->C.row, k = params->A.column, block_size = params->block_size;
+    const int num_block = k / block_size; // block_size = 32
+
+    for (int row = mat_args->start_i; row < mat_args->end_i; row++)
+    {
+        for (int col = 0; col < n; col++)
+        {
+#ifdef QM_ARM
+            // ...existing code for ARM SIMD...
+#endif
+#ifdef QM_x86
+            // ...existing code for x86 SIMD...
+#endif
+        }
+    }
+
+    return NULL;
+}
+
 namespace matmul
 {
     void MatmulOperator::mat_mul_all_techniques(struct matmul_params *params)
@@ -252,4 +285,24 @@ namespace matmul
             pthread_join(thread_pool[j], NULL);
         }
     };
+    void mat_mul_transposed_all_techniques(struct matmul_params *params)
+    {
+        const int num_thread = 8;
+        pthread_t thread_pool[num_thread];
+        struct w4a8_thread_args_transposed threads_args[num_thread];
+        const struct matrix *C = &params->C;
+
+        for (int i = 0; i < num_thread; i++)
+        {
+            threads_args[i].params = params;
+            threads_args[i].start_i = i * (C->row / num_thread);
+            threads_args[i].end_i = (i + 1) * (C->row / num_thread);
+            pthread_create(&thread_pool[i], NULL, all_techniques_worker_func_transposed, &threads_args[i]);
+        }
+
+        for (int i = 0; i < num_thread; i++)
+        {
+            pthread_join(thread_pool[i], NULL);
+        }
+    }
 } // namespace matmul
