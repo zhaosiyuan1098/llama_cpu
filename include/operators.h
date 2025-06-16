@@ -1,16 +1,9 @@
 #ifndef OPERATORS_H
 #define OPERATORS_H
-#include <cassert>
+
 
 #include "common.h"
-#include "matmul.h"
 
-#include "linear.h"
-#include "embedding.h"
-#include "rotaryPosEmb.h"
-#include "bmm.h"
-#include "rmsNorm.h"
-#include "embedding.h"
 
 
 #define BLK_SIZE 16

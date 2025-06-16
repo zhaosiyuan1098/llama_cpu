@@ -1,4 +1,5 @@
 #include "llamaDecoder_int4.h"
+#include <limits>
 
 Int4llamaDecoder::Int4llamaDecoder(std::string param_path, const struct model_config config)
 {

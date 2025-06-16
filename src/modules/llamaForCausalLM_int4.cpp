@@ -26,7 +26,7 @@ struct Int4LlamaForCausalLM_output Int4LlamaForCausalLM::forward(const struct In
     }
     else
     {
-        struct Int4llamaDecoder_input decoder_input = {input.input_ids};
+        struct Int4llamaDecoder_input decoder_input(input.input_ids);
         decoder_output = this->decoder.forward(decoder_input);
     }
 

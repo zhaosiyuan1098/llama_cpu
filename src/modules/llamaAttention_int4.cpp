@@ -1,5 +1,8 @@
 #include "llamaAttention_int4.h"
 #include <dirent.h>
+#include <cmath>
+#include "operators.h"
+#include <limits>
 
 static float *attn_weights_arr;
 static float ***key_states_arr_cache;

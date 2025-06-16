@@ -2,6 +2,8 @@
 #define LLAMA_DECODERLAYER_INT4
 
 #include "llamaAttention_int4.h"
+#include "rmsNorm.h"
+#include "linear.h"
 
 struct Int4llamaDecoderLayer_output
 {
@@ -46,8 +48,8 @@ struct Int4llamaDecoderLayer_input
 
 class Int4llamaDecoderLayer {
    public:
-    Int4llamaDecoderLayer(std::string param_path, const struct model_config config, int layer_idx);
-    void allocate_memory(const struct model_config config);
+    Int4llamaDecoderLayer(std::string param_path, struct model_config config, int layer_idx);
+    void allocate_memory(struct model_config config);
     struct Int4llamaDecoderLayer_output forward(const struct Int4llamaDecoderLayer_input &input);
 
     int embed_dim, num_attention_heads, hidden_dim, layer_idx;

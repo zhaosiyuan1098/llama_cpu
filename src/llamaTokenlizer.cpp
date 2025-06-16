@@ -5,7 +5,7 @@
  */
 struct llama_file {
     FILE * fp;
-    size_t size;
+    size_t size{};
 
     llama_file(const char * fname, const char * mode) {
         fp = std::fopen(fname, mode);
@@ -15,20 +15,20 @@ struct llama_file {
         }
     }
 
-    void read_raw(void * ptr, size_t size) {
+    void read_raw(void * ptr, size_t size) const {
         if (size == 0) {
             return;
         }
         std::size_t ret = std::fread(ptr, size, 1, fp);
     }
 
-    std::uint32_t read_u32() {
+    [[nodiscard]] std::uint32_t read_u32() const {
         std::uint32_t ret;
         read_raw(&ret, sizeof(ret));
         return ret;
     }
 
-    std::string read_string(std::uint32_t len) {
+    [[nodiscard]] std::string read_string(std::uint32_t len) const {
         std::vector<char> chars(len);
         read_raw(chars.data(), len);
         return std::string(chars.data(), len);
@@ -46,7 +46,7 @@ llama_vocab llama_init_vocab(const char * vocab_file) {
 
     // Read dummy data
     for (int i = 0; i < 9; i++) {
-        file.read_u32();
+        (void)file.read_u32();
     }
 
     for (uint32_t i = 0; i < n_vocab; i++) {
@@ -78,14 +78,14 @@ const char * llama_id_to_token(const llama_vocab & vocab, int id) {
 }
 
 struct llama_tokenizer {
-    llama_tokenizer(const llama_vocab & vocab): vocab_(vocab) {}
+    explicit llama_tokenizer(const llama_vocab & vocab): vocab_(vocab) {}
 
     void tokenize(const std::string & text, std::vector<int32_t> & output) {
         // split string into utf8 chars
         int index = 0;
         size_t offs = 0;
         while (offs < text.size()) {
-            llama_sp_symbol sym;
+            llama_sp_symbol sym{};
             size_t char_len = std::min(text.size() - offs, utf8_len(text[offs]));
             sym.text = text.c_str() + offs;
             sym.n = char_len;
@@ -167,7 +167,7 @@ private:
 
         const auto &tok_score = vocab_.id_to_token[(*token).second];
 
-        llama_sp_bigram bigram;
+        llama_sp_bigram bigram{};
         bigram.left = left;
         bigram.right = right;
         bigram.score = tok_score.score;

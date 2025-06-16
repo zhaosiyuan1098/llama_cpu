@@ -109,7 +109,7 @@ int main(int argc, char **argv)
         case INT4:
         {
             std::string current_path = std::filesystem::current_path().string();
-            std::string absolute_path = current_path.substr(0, current_path.find("/build"));
+            std::string absolute_path = current_path.substr(0, current_path.find("/cmake-build-release"));
             std::string m_path = absolute_path + "/model/INT4/" + model_path[target_model];
             std::cout << "Loading model from path: " << m_path << std::endl;
             Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, model_config);
@@ -119,8 +119,8 @@ int main(int argc, char **argv)
             while (true)
             {
                 std::cout << "USER: ";
-                std::string input;
-                std::getline(std::cin, input);
+                std::string input="hello";
+                // std::getline(std::cin, input);
                 input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
                 std::string vocab_path = absolute_path + "/model/vocab/llama_vocab.bin" ;
                 LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, vocab_path, true);

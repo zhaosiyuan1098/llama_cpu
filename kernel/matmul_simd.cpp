@@ -181,7 +181,7 @@ namespace matmul
                     w_start += 1;
                     a_start += 2;
                 }
-                float *ptr = (float *)&acc0;
+                auto *ptr = (float *)&acc0;
                 C->data_ptr[row * n + col] = ptr[0] + ptr[1] + ptr[2] + ptr[3] + ptr[4] + ptr[5] + ptr[6] + ptr[7];
 #endif
             }

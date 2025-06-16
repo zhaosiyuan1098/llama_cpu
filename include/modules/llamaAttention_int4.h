@@ -2,13 +2,13 @@
 #define LLAMA_ATTENTION_INT4_H
 
 #include <utility>
-#include <cstdlib>
 #include <string>
 #include <vector>
 
 #include "common.h"
-#include "operators.h"
-#include "utlis.h"
+#include "linear.h"
+#include "rotaryPosEmb.h"
+#include "bmm.h"
 
 struct Int4llamaAttention_output {
     Matrix3D<float> attn_output;
@@ -38,15 +38,15 @@ struct Int4llamaAttention_input {
 
 class Int4llamaAttention {
    public:
-    Int4llamaAttention(std::string param_path, const struct model_config config);
-    Int4llamaAttention() {}
-    static void allocate_memory(const struct model_config config);
+    Int4llamaAttention(std::string param_path, struct model_config config);
+    Int4llamaAttention() = default;
+    static void allocate_memory(struct model_config config);
     struct Int4llamaAttention_output forward(const struct Int4llamaAttention_input &input);
 
    private:
     void unshape(Matrix3D<float> shaped, Matrix3D<float> unshape, int sqlen);
     void shape(Matrix3D<float> unshape, Matrix3D<float> shaped, int sqlen);
-    int embed_dim, num_heads, head_dim;
+    int embed_dim{}, num_heads{}, head_dim{};
     Linear_FP_int4 k_proj, v_proj, q_proj, o_proj;
     RotaryPosEmb rotary_pos_emb;
     BMM_F32T qk_bmm, pv_bmm;

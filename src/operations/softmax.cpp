@@ -1,5 +1,6 @@
 #include <cmath>
 #include "operators.h"
+#include "utlis.h"
 
 void softmax(const Matrix3D<float> &input, Matrix3D<float> &output, const int dim) {
     PROFILE_START("softmax");

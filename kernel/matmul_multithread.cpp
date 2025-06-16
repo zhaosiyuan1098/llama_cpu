@@ -12,7 +12,7 @@ struct multithreading_thread_args {
     const struct matmul_params* params;
 };
 static void* multithreading_worker_func(void* args) {
-    struct multithreading_thread_args* mat_args = (struct multithreading_thread_args*)args;
+    auto* mat_args = (struct multithreading_thread_args*)args;
     const struct matmul_params* params = mat_args->params;
     const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
     const int block_size = params->block_size;
@@ -78,15 +78,15 @@ static void* multithreading_worker_func(void* args) {
                 for (int qj = 0; qj < 32; qj++) {
                     // decode a packed byte into two int8 in the range of (-8, 7)
                     uint8_t packed_int4_0 = w_int4[qj];
-                    signed char w_de_0 = (packed_int4_0 & 0x0F) - 8.0;
-                    signed char w_de_16 = (packed_int4_0 >> 4) - 8.0;
+                    auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F);
+                    auto w_de_16 =static_cast<signed char>(packed_int4_0 >> 4) - 8;
                     // int8 multiply and accumulate operation
                     intermediate_sum += a_int8[qj] * w_de_0;
                     intermediate_sum_2nd += a_int8[qj + 32] * w_de_16;
                 }
                 // dequantize the sum into floating point
-                acc += (float)intermediate_sum * s_a * s_w;
-                acc += (float)intermediate_sum_2nd * s_a_2nd * s_w_2nd;
+                acc += static_cast<float>(intermediate_sum) * s_a * s_w;
+                acc += static_cast<float>(intermediate_sum_2nd) * s_a_2nd * s_w_2nd;
                 ch += block_size * 2;
 #endif
             }
@@ -105,7 +105,7 @@ void MatmulOperator::mat_mul_multithreading(struct matmul_params* params) {
 
     int m = C->row, n = C->column, k = A->column;
 
-    const int num_thread = 4;
+    constexpr int num_thread = 4;
     pthread_t thread_pool[num_thread];
     struct multithreading_thread_args threads_args[num_thread];
 
@@ -114,11 +114,11 @@ void MatmulOperator::mat_mul_multithreading(struct matmul_params* params) {
         threads_args[j].params = params;
         threads_args[j].start = j * (n / num_thread);  // n is C->column
         threads_args[j].end = (j + 1) * (n / num_thread);
-        pthread_create(&thread_pool[j], NULL, multithreading_worker_func, &threads_args[j]);
+        pthread_create(&thread_pool[j], nullptr, multithreading_worker_func, &threads_args[j]);
     }
     // TODO: Join threads
-    for (int j = 0; j < num_thread; j++){
-        pthread_join(thread_pool[j], NULL);
+    for (unsigned long j : thread_pool){
+        pthread_join(j, nullptr);
     }
 };
 }  // namespace matmul

@@ -1,3 +1,7 @@
+
+#ifndef PROFILER_H
+#define PROFILER_H
+
 #include <chrono>
 #include <iostream>
 #include <map>
@@ -58,13 +62,15 @@ class Profiler {
 #endif
     }
 
-   private:
-    Profiler() {}
+
+    Profiler() = default;
     Profiler(const Profiler&) = delete;
     Profiler& operator=(const Profiler&) = delete;
-
+private:
     std::map<std::string, std::chrono::high_resolution_clock::time_point> start_times;
     std::map<std::string, long long> flops;
     std::map<std::string, long long> durations;
     std::map<std::string, int> counts;
 };
+
+#endif

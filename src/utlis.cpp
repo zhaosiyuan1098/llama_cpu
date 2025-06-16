@@ -41,10 +41,10 @@ struct max_error_info {
     float a1, a2;
 };
 
-bool check_two_equal(float* array, float* array2, int size, float error) {
+bool check_two_equal(const float* array, const float* array2, int size, float error) {
     float sq_diff = 0;
     float max_sqdiff = 0;
-    struct max_error_info error_info;
+    struct max_error_info error_info{};
 
     for (int i = 0; i < size; i++) {
         float diff = (float)array[i] - (float)array2[i];
@@ -112,7 +112,7 @@ bool check_two_exact_equal(int8_t* array, int8_t* array2, int size) {
     return true;
 }
 
-bool check_two_equal(int8_t* array, int8_t* array2, int size, float error) {
+bool check_two_equal(const int8_t* array, const int8_t* array2, int size, float error) {
     float sq_diff = 0;
     float max_sqdiff = 0;
     for (int i = 0; i < size; i++) {
@@ -130,7 +130,7 @@ bool check_two_equal(int8_t* array, int8_t* array2, int size, float error) {
 void print_MSE_max_diff(float* a, float* a2, int size) {
     float sq_diff = 0;
     float max_sqdiff = 0;
-    struct max_error_info error_info;
+    struct max_error_info error_info{};
 
     for (int i = 0; i < size; i++) {
         float diff = (float)a[i] - (float)a2[i];
@@ -160,7 +160,7 @@ bool check_two_equal<int>(int* array, int* array2, int size) {
     return true;
 }
 
-void print_first_k_elelment(std::string name, const int8_t* arr, int k, int start_idx) {
+void print_first_k_element(const std::string& name, const int8_t* arr, int k, int start_idx) {
     std::cout << name << ":";
     for (int i = start_idx; i < k; i++) {
         std::cout << static_cast<int>(arr[i]) << ",";
@@ -168,7 +168,7 @@ void print_first_k_elelment(std::string name, const int8_t* arr, int k, int star
     std::cout << std::endl;
 }
 
-void print_first_k_elelment(std::string name, const int32_t* arr, int k, int start_idx) {
+void print_first_k_element(const std::string& name, const int32_t* arr, int k, int start_idx) {
     std::cout << name << ":";
     for (int i = start_idx; i < k; i++) {
         std::cout << static_cast<int>(arr[i]) << ",";
@@ -176,7 +176,7 @@ void print_first_k_elelment(std::string name, const int32_t* arr, int k, int sta
     std::cout << std::endl;
 }
 
-void print_first_k_elelment(std::string name, const float* arr, int k, int start_idx) {
+void print_first_k_element(const std::string& name, const float* arr, int k, int start_idx) {
     std::cout << name << ":";
     for (int i = start_idx; i < k; i++) {
         std::cout << static_cast<float>(arr[i]) << ",";

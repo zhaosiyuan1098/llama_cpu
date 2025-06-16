@@ -5,11 +5,11 @@
 
 class BMM_F32T {
    public:
-    BMM_F32T(float _alpha);
-    BMM_F32T(){};
+    explicit BMM_F32T(float _alpha);
+    BMM_F32T()= default;
     void forward(const Matrix3D<float> &x, const Matrix3D<float> &weight, Matrix3D<float> &output);
     void forward_weight_untransposed(const Matrix3D<float> &x, const Matrix3D<float> &weight, Matrix3D<float> &output);
-    float alpha;
+    float alpha{};
 
    private:
     std::string profile_name = "BMM_F32T";

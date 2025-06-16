@@ -1,6 +1,6 @@
-#include <assert.h>
+#include <cassert>
 #include <pthread.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include <cmath>
 #include <cstdlib>
@@ -24,11 +24,11 @@ struct w4a8_thread_args
 
 static void *all_techniques_worker_func(void *args)
 {
-    struct w4a8_thread_args *mat_args = (struct w4a8_thread_args *)args;
+    auto *mat_args = (struct w4a8_thread_args *)args;
     const struct matmul_params *params = mat_args->params;
     const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
     int n = params->C.column, m = params->C.row, k = params->A.column, block_size = params->block_size;
-    const int num_block = k / block_size; // block_size = 32
+    // const int num_block = k / block_size; // block_size = 32
 
     for (int row = 0; row < m; row++)
     {
@@ -212,13 +212,13 @@ static void *all_techniques_worker_func(void *args)
                 w_start += 2;
                 a_start += 4;
             }
-            float *ptr = (float *)&accumulator;
+            auto *ptr = (float *)&accumulator;
             C->data_ptr[row * n + col] = ptr[0] + ptr[1] + ptr[2] + ptr[3] + ptr[4] + ptr[5] + ptr[6] + ptr[7];
 #endif
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 struct w4a8_thread_args_transposed
@@ -231,7 +231,7 @@ struct w4a8_thread_args_transposed
 //TODO
 static void *all_techniques_worker_func_transposed(void *args)
 {
-    struct w4a8_thread_args_transposed *mat_args = (struct w4a8_thread_args_transposed *)args;
+    auto *mat_args = (struct w4a8_thread_args_transposed *)args;
     const struct matmul_params *params = mat_args->params;
     const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
     int n = params->C.column, m = params->C.row, k = params->A.column, block_size = params->block_size;
@@ -250,7 +250,7 @@ static void *all_techniques_worker_func_transposed(void *args)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 namespace matmul
@@ -267,7 +267,7 @@ namespace matmul
 
         quantize_fp32_to_int8(A->data_ptr, A->int8_data_ptr, params->A_scales, A->row * A->column, block_size);
 
-        const int num_thread = 8;
+        constexpr  int num_thread = 8;
         pthread_t thread_pool[num_thread];
         struct w4a8_thread_args threads_args[num_thread];
         assert(params->block_size == 32); // support block size 32 for now
@@ -277,15 +277,16 @@ namespace matmul
             threads_args[j].params = params;
             threads_args[j].start_j = j * (C->column / num_thread);
             threads_args[j].end_j = (j + 1) * (C->column / num_thread);
-            pthread_create(&thread_pool[j], NULL, all_techniques_worker_func, &threads_args[j]);
+            pthread_create(&thread_pool[j], nullptr, all_techniques_worker_func, &threads_args[j]);
         }
 
-        for (int j = 0; j < num_thread; j++)
+        for (unsigned long j : thread_pool)
         {
-            pthread_join(thread_pool[j], NULL);
+            pthread_join(j, nullptr);
         }
-    };
-    void mat_mul_transposed_all_techniques(struct matmul_params *params)
+    }
+
+    void MatmulOperator::mat_mul_transposed_all_techniques(struct matmul_params* params)
     {
         const int num_thread = 8;
         pthread_t thread_pool[num_thread];
@@ -297,12 +298,12 @@ namespace matmul
             threads_args[i].params = params;
             threads_args[i].start_i = i * (C->row / num_thread);
             threads_args[i].end_i = (i + 1) * (C->row / num_thread);
-            pthread_create(&thread_pool[i], NULL, all_techniques_worker_func_transposed, &threads_args[i]);
+            pthread_create(&thread_pool[i], nullptr, all_techniques_worker_func_transposed, &threads_args[i]);
         }
 
-        for (int i = 0; i < num_thread; i++)
+        for (unsigned long i : thread_pool)
         {
-            pthread_join(thread_pool[i], NULL);
+            pthread_join(i, nullptr);
         }
     }
 } // namespace matmul

@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <pthread.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include <cmath>
 #include <cstdlib>
@@ -12,7 +12,7 @@
 
 namespace matmul
 {
-    void MatmulOperator::mat_mul_reference(struct matmul_params *params)
+    void MatmulOperator::mat_mul_reference(struct  matmul_params *params)
     {
         const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
         const int block_size = params->block_size; // block_size = 32
@@ -85,15 +85,15 @@ namespace matmul
                     {
                         // decode a packed byte into two int8 in the range of (-8, 7)
                         uint8_t packed_int4_0 = w_int4[qj];
-                        signed char w_de_0 = (packed_int4_0 & 0x0F) - 8.0;
-                        signed char w_de_16 = (packed_int4_0 >> 4) - 8.0;
+                        auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F);
+                        auto w_de_16 =static_cast<signed char>(packed_int4_0 >> 4) - 8;
                         // int8 multiply and accumulate operation
                         intermediate_sum += a_int8[qj] * w_de_0;
                         intermediate_sum_2nd += a_int8[qj + 32] * w_de_16;
                     }
                     // dequantize the sum into floating point
-                    acc += (float)intermediate_sum * s_a * s_w;
-                    acc += (float)intermediate_sum_2nd * s_a_2nd * s_w_2nd;
+                    acc += static_cast<float>(intermediate_sum) * s_a * s_w;
+                    acc += static_cast<float>(intermediate_sum_2nd) * s_a_2nd * s_w_2nd;
                     ch += block_size * 2;
 #endif
                 }
@@ -119,4 +119,6 @@ namespace matmul
                 data_C[i * C->column + j] = acc;
             }
     }
+
+
 }

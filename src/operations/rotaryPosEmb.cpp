@@ -1,5 +1,8 @@
 #include "operators.h"
 #include <cmath>
+#include "utlis.h"
+#include "rotaryPosEmb.h"
+#include "assert.h"
 
 float q_buf[4096], k_buf[4096];
 // TODO: optimize this with multithreading

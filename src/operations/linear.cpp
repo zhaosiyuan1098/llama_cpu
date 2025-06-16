@@ -3,6 +3,8 @@
 #include"linear.h"
 
 #include "operators.h"
+#include "utlis.h"
+#include "matmul.h"
 
 static int8_t *x_int8;
 static float *x_scale;

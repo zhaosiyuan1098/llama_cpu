@@ -1,6 +1,8 @@
 #include"bmm.h"
 #include"operators.h"
 #include"utlis.h"
+#include "assert.h"
+#include "matmul.h"
 
 
 BMM_F32T::BMM_F32T(float _alpha) { this->alpha = _alpha; }

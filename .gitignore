@@ -7,3 +7,7 @@ build/
 
 .vscode/
 model/INT4
+
+#clion cache
+/cmake-build-debug
+/cmake-build-release

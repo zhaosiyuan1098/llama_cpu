@@ -1,5 +1,5 @@
 #include "llamaDecoderlayer_int4.h"
-
+#include "math.h"
 
 static float *hidden_states_float_arr;
 static float *final_layer_norm_arr;

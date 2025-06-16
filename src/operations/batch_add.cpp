@@ -1,4 +1,6 @@
 #include "operators.h"
+#include "assert.h"
+#include "utlis.h"
 
 void batch_Add(const Matrix3D<float> &input, const Matrix3D<float> &input2,Matrix3D<float> &output) {
     PROFILE_START("batch_Add");

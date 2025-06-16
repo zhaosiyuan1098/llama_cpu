@@ -2,7 +2,9 @@
 
 #include "operators.h"
 #include "utlis.h"
-
+#include "common.h"
+#include "assert.h"
+#include <math.h>
 void LlamaRMSNorm::forward(const Matrix3D<float> &x, Matrix3D<float> &output)
 {
     PROFILE_START(profile_name);

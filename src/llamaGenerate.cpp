@@ -2,9 +2,11 @@
 #include "utlis.h"
 #include "generate.h"
 #include "llamaTokenizer.h"
+#include "profiler.h"
+#include "opt_params.h"
 
-std::vector<int> LLaMAGenerate(void *model_ptr, int model_type, std::string text,
-                               const struct opt_params generation_config, std::string voc_path, bool interactive)
+std::vector<int> LLaMAGenerate(void *model_ptr, int model_type, const std::string& text,
+                               const struct opt_params& generation_config, const std::string& voc_path, bool interactive)
 {
     std::vector<int> last_n_tokens(generation_config.n_ctx);
     std::fill(last_n_tokens.begin(), last_n_tokens.end(), 0);
@@ -46,7 +48,7 @@ std::vector<int> LLaMAGenerate(void *model_ptr, int model_type, std::string text
         int sqlen = 1;
         if (model_type == LLaMA_INT4)
         {
-            Int4LlamaForCausalLM *model = static_cast<Int4LlamaForCausalLM *>(model_ptr);
+            auto *model = static_cast<Int4LlamaForCausalLM *>(model_ptr);
             struct Int4LlamaForCausalLM_output model_output;
             struct Int4LlamaForCausalLM_input model_input;
             if (has_past_kv)
@@ -58,7 +60,7 @@ std::vector<int> LLaMAGenerate(void *model_ptr, int model_type, std::string text
             {
                 sqlen = input_ids.size();
                 Matrix3D<int> input_ids_mat(input_ids.data(), 1, 1, sqlen);
-                model_input = {input_ids_mat};
+                model_input = Int4LlamaForCausalLM_input(input_ids_mat);
             }
             if (has_past_kv)
                 STATS_START("Inference latency");

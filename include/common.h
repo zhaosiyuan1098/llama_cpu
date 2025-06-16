@@ -7,9 +7,8 @@
 #include <stdexcept>
 
 #include "model.h"
-#include "opt_params.h"
 
-#define MAX_LINEAR_LENGTH 1024 * 1024 * 16  // 16MB, TO BE REMOVED with better memory allocation!
+#define MAX_LINEAR_LENGTH (1024 * 1024 * 16)  // 16MB, TO BE REMOVED with better memory allocation!
 #define DEBUG false
 
 #define DEBUG_INS(x) \
@@ -68,7 +67,7 @@ class Matrix3D {
         return true;
     }
 
-    int length() const { return m_dim_x * m_dim_y * m_dim_z; }
+    [[nodiscard]] int length() const { return m_dim_x * m_dim_y * m_dim_z; }
     T sum() const {
         T sum = 0;
         for (int i = 0; i < this->length(); i++) {
@@ -96,20 +95,20 @@ class Matrix3D {
         std::ifstream infile(path, std::ios::binary | std::ios::in);
         if (infile.fail()) {
             std::cout << strerror(errno) << ": " << path << std::endl;
-            throw("Expected error...");
+            throw std::runtime_error("Expected error...");
         } else {
             infile.read(reinterpret_cast<char *>(this->m_data), this->length() * sizeof(T));
             infile.close();
         }
     }
     T *m_data;
-    int m_dim_x, m_dim_y, m_dim_z;
+    int m_dim_x{}, m_dim_y{}, m_dim_z{};
 
     // Default constructor
     Matrix3D() { m_data = NULL; }
 };
 
-static inline void debug_info(std::string s) {
+static inline void debug_info(const std::string& s) {
 #ifdef DEBUG
     std::cout << s << std::endl;
 #endif
