@@ -3,8 +3,7 @@
 ## 介绍
 * 此项目旨在解决大语言模型（LLM）在CPU 端进行本地化部署时，现有推理框架普遍存在的体积臃肿、性能不佳、难以定制的问题。
 * 不依赖任何第三方深度学习库，设计并实现了一个轻量级、跨平台的C++ 推理引擎。
-在各类CPU 硬件上（从服务器到嵌入式设备）实现对Llama等Transformer 架构模型推理性能优化
-* 为模型的私有化、 低成本和低延迟应用提供一个高效、可靠的解决方案
+在各类CPU硬件上（从服务器到嵌入式设备）实现对Llama等Transformer 架构模型推理性能优化（W4A8）
 
 ## 结构
 参照llama原始结构实现
@@ -36,7 +35,15 @@
     unzip LLaMA_7B_2_chat.zip
 
    ```
+
+* arm
+```bash
+    cd ./model
+    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/1trpw92vmh4czvl28hkv0/LLaMA_7B_2_chat.zip?rlkey=dy1pdek0147gnuxdzpodi6pkt&dl=1"
+    unzip LLaMA_7B_2_chat.zip
+  ```
     
+ps:不知道自己是arm还是x86？直接编译！终端会告诉你的🤓
 ### 编译与运行
 
 可选择cmake或xmake

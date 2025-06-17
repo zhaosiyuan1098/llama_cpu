@@ -42,9 +42,12 @@ add_executable(quick_infer
 )
 
 # 6. 通过 IMP 宏设置 Matmul 实现
-set(QUICK_INFER_MATMUL_IMPLEMENTATION "4" CACHE STRING "选择要使用的 matmul 实现 (0-4)")
+set(QUICK_INFER_MATMUL_IMPLEMENTATION "2" CACHE STRING "选择要使用的 matmul 实现 (0-4)")
 set_property(CACHE QUICK_INFER_MATMUL_IMPLEMENTATION PROPERTY STRINGS "0" "1" "2" "3" "4")
 target_compile_definitions(quick_infer PRIVATE "IMP=${QUICK_INFER_MATMUL_IMPLEMENTATION}")
+# 通过 NUM_THREAD 宏设置使用线程数量
+set(NUM_THREADS "10" CACHE STRING "Set the number of threads for multithreading")
+target_compile_definitions(quick_infer PRIVATE "NUM_THREAD_MATMUL=${NUM_THREADS}")
 
 # --- 从这里开始修复 ---
 

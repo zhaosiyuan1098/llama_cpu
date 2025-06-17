@@ -7,6 +7,8 @@
 
 #include "matmul.h"
 #include "common.h"
+#include "operators.h"
+
 struct multithreading_thread_args {
     int start, end;
     const struct matmul_params* params;
@@ -78,7 +80,7 @@ static void* multithreading_worker_func(void* args) {
                 for (int qj = 0; qj < 32; qj++) {
                     // decode a packed byte into two int8 in the range of (-8, 7)
                     uint8_t packed_int4_0 = w_int4[qj];
-                    auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F);
+                    auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F)-8;
                     auto w_de_16 =static_cast<signed char>(packed_int4_0 >> 4) - 8;
                     // int8 multiply and accumulate operation
                     intermediate_sum += a_int8[qj] * w_de_0;
@@ -105,7 +107,8 @@ void MatmulOperator::mat_mul_multithreading(struct matmul_params* params) {
 
     int m = C->row, n = C->column, k = A->column;
 
-    constexpr int num_thread = 4;
+    const int num_thread = NUM_THREAD_MATMUL;
+
     pthread_t thread_pool[num_thread];
     struct multithreading_thread_args threads_args[num_thread];
 

@@ -14,6 +14,7 @@ namespace matmul
 {
     void MatmulOperator::mat_mul_reference(struct  matmul_params *params)
     {
+        //C=(A*B^T)*scale+offset
         const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
         const int block_size = params->block_size; // block_size = 32
         float *scale = params->scales, *offset = params->offset;
@@ -85,7 +86,7 @@ namespace matmul
                     {
                         // decode a packed byte into two int8 in the range of (-8, 7)
                         uint8_t packed_int4_0 = w_int4[qj];
-                        auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F);
+                        auto w_de_0 =static_cast<signed char>(packed_int4_0 & 0x0F)-8;
                         auto w_de_16 =static_cast<signed char>(packed_int4_0 >> 4) - 8;
                         // int8 multiply and accumulate operation
                         intermediate_sum += a_int8[qj] * w_de_0;

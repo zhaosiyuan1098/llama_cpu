@@ -60,6 +60,7 @@ void quantize_fp32_to_int8(float* A, int8_t* qA, float* sA, int size, int block_
     int nb = size / 32;
     for (int i = 0; i < nb; i++) {
         // Load elements into 4 AVX vectors
+        //一次处理32个float32
         __m256 v0 = _mm256_loadu_ps(A);
         __m256 v1 = _mm256_loadu_ps(A + 8);
         __m256 v2 = _mm256_loadu_ps(A + 16);
@@ -72,9 +73,15 @@ void quantize_fp32_to_int8(float* A, int8_t* qA, float* sA, int size, int block_
         maxAbs = _mm256_max_ps(maxAbs, _mm256_andnot_ps(signBit, v1));
         maxAbs = _mm256_max_ps(maxAbs, _mm256_andnot_ps(signBit, v2));
         maxAbs = _mm256_max_ps(maxAbs, _mm256_andnot_ps(signBit, v3));
-
+        //水平规约
+        //_mm256_extractf128_ps(maxAbs, 1)取高128位，_mm256_castps256_ps128(maxAbs))取低128位，_mm_max_ps按位求最大值
         __m128 max4 = _mm_max_ps(_mm256_extractf128_ps(maxAbs, 1), _mm256_castps256_ps128(maxAbs));
+        //原max4=[d,c,b,a]
+        //_mm_movehl_ps 将高64位 ([d|c]) 复制到低64位-> dcdc
+        //现max4= [    d    |     c    | max(b,d) | max(a,c)]
         max4 = _mm_max_ps(max4, _mm_movehl_ps(max4, max4));
+        //_mm_movehdup_ps(max4)->[    d    |     c    | max(b,d) | max(b,d)]
+        //max4最低位：max（a,b,c,d)
         max4 = _mm_max_ss(max4, _mm_movehdup_ps(max4));
         const float maxScalar = _mm_cvtss_f32(max4);
 
@@ -105,7 +112,7 @@ void quantize_fp32_to_int8(float* A, int8_t* qA, float* sA, int size, int block_
         // Convert int32 to int16
         i0 = _mm256_packs_epi32(i0, i1);  // 0, 1, 2, 3,  8, 9, 10, 11,  4, 5, 6, 7, 12, 13, 14, 15
         i2 = _mm256_packs_epi32(i2, i3);  // 16, 17, 18, 19,  24, 25, 26, 27,  20, 21, 22, 23, 28, 29, 30, 31
-                                          // Convert int16 to int8
+        // Convert int16 to int8
         i0 = _mm256_packs_epi16(i0, i2);  // 0, 1, 2, 3,  8, 9, 10, 11,  16, 17, 18, 19,  24, 25, 26, 27,  4, 5, 6, 7,
                                           // 12, 13, 14, 15, 20, 21, 22, 23, 28, 29, 30, 31
 
