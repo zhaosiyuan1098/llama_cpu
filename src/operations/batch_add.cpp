@@ -1,6 +1,7 @@
 #include "operators.h"
-#include "assert.h"
+#include <cassert>
 #include "utlis.h"
+#include <stdexcept>
 
 void batch_Add(const Matrix3D<float> &input, const Matrix3D<float> &input2,Matrix3D<float> &output) {
     PROFILE_START("batch_Add");
@@ -20,7 +21,7 @@ void batch_Add(const Matrix3D<float> &input, const Matrix3D<float> &input2,Matri
             }
         }
     } else {
-        throw("Unsupported dimension for softmax");
+        throw std::runtime_error("Unsupported dimension for softmax");
     }
     PROFILE_END("batch_Add");
 }

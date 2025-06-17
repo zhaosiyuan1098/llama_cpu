@@ -1,46 +1,61 @@
-# quick_infer
+# llama_cpu
 
 ## 介绍
+* 此项目旨在解决大语言模型（LLM）在CPU 端进行本地化部署时，现有推理框架普遍存在的体积臃肿、性能不佳、难以定制的问题。
+* 不依赖任何第三方深度学习库，设计并实现了一个轻量级、跨平台的C++ 推理引擎。
+在各类CPU 硬件上（从服务器到嵌入式设备）实现对Llama等Transformer 架构模型推理性能优化
+* 为模型的私有化、 低成本和低延迟应用提供一个高效、可靠的解决方案
 
-在x86和arm架构下，使用KVcache、SIMD、多线程、循环展开等方法对llama2推理加速
+## 结构
+参照llama原始结构实现
+![](./pic/llama2_structure.png)
 
-纯c++实现，执行效率高
+[具体代码架构](./structure.txt)
 
-## 依赖
-
-- [xmake](https://github.com/xmake-io/xmake)
-
+## 特点
+* 从零构建核心算子库，为支持现代Transformer 模型，自主实现了RMSNorm、旋转位置编码(RoPE) 等关键模块。
+* 使用 SIMD(AVX2/NEON) 指令集进行向量化加速
+* 利用多线程技术提升并行处理能力
+* 实现KV-Cache机制以降低生成延迟
+* 自动检测cpu架构并编译对应代码
 ## 使用方法
+### 下载代码
 
-1. 安装[xmake](https://github.com/xmake-io/xmake)
-2. 克隆仓库并进入目录：
-    ```bash
-    git clone https://github.com/zhaosiyuan1098/yuangine.git
-    cd yuangine
-    ```
+```bash
+    git clone https://github.com/zhaosiyuan1098/llama_cpu.git
+    cd llama_cpu
+   ```
+    
+### 下载模型
+* x86
 
-3. 下载所需模型：
-* 使用curl下载
-    ```bash
+```bash
     
     cd ./model
-
-    ```
-
-    * x86:
-    ```bash
     curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/vu7wnes1c7gkcegg854ys/LLaMA_7B_2_chat.zip?rlkey=q61o8fpc954g1ke6g2eaot7cf&dl=1"
-    ```
-    * ARM:
-    ```bash
-    curl -L -o LLaMA_7B_2_chat.zip "https://www.dropbox.com/scl/fi/1trpw92vmh4czvl28hkv0/LLaMA_7B_2_chat.zip?rlkey=dy1pdek0147gnuxdzpodi6pkt&dl=1"
-    ```
-    解压
-    ```bash
     unzip LLaMA_7B_2_chat.zip
-    ```
 
-* 使用python下载其他模型（可选）
+   ```
+    
+### 编译与运行
+
+可选择cmake或xmake
+* cmake
+```bash
+    cd ..
+    mkdir "build" && cd ./build && cmake ..
+    make 
+    ./quick_infer
+ ```
+
+* [xmake](https://github.com/xmake-io/xmake)
+```bash
+    cd ..
+    xmake
+    xmake run
+ ```
+
+### 使用python下载其他模型（可选）
     ```bash
     conda create -n yuangine python=3.10
     conda activate yuangine
@@ -49,21 +64,7 @@
 
     python download_model.py --model 想要下载的模型名 --QM 对应的架构
     ```
-3. 编译项目：
-    ```bash
-    cd ..
-    xmake
-    ```
-4. 运行项目：
-    ```bash
-    xmake run
-    ```
 
-## 结构
-参照llama2原始结构实现
-![](./pic/llama2_structure.png)
-
-[具体代码架构](./structure.txt)
 
 ## 效果展示
 
