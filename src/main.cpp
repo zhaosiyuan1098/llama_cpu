@@ -108,22 +108,25 @@ int main(int argc, char **argv)
         {
         case INT4:
         {
-            std::string current_path = std::filesystem::current_path().string();
-            std::string absolute_path = current_path.substr(0, current_path.find("/cmake-build-release"));
-            std::string m_path = absolute_path + "/model/INT4/" + model_path[target_model];
+            std::filesystem::path project_root(PROJECT_ROOT_DIR); // 直接使用宏
+            std::filesystem::path m_path_fs = project_root / "model" / "INT4" / model_path[target_model];
+            std::string m_path = m_path_fs.string();
             std::cout << "Loading model from path: " << m_path << std::endl;
             Int4LlamaForCausalLM model = Int4LlamaForCausalLM(m_path, model_config);
             std::cout << "All load Finished! now you can chat with llm in the terminal~" << std::endl;
 
             // Get input from the user
-            while (true)
+                auto i=0;
+            while (i<1)
             {
                 std::cout << "USER: ";
                 std::string input="hello";
                 // std::getline(std::cin, input);
                 input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
-                std::string vocab_path = absolute_path + "/model/vocab/llama_vocab.bin" ;
+                std::filesystem::path vocab_path_fs = project_root / "model" / "vocab" / "llama_vocab.bin";
+                std::string vocab_path = vocab_path_fs.string();
                 LLaMAGenerate(&model, LLaMA_INT4, input, generation_config, vocab_path, true);
+                i++;
             }
             break;
         }

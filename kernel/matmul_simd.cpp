@@ -89,6 +89,7 @@ namespace matmul
                 //               8 bits (byte)
                 //            low|----------------------------------------------------------|high
                 //               0                         256 bit
+                //一个256位的浮点数向量寄存器，初始化为全零。它将用来累加8个并行的浮点部分和，在所有块计算完毕后，这8个部分和会被加在一起得到最终结果
                 __m256 acc0 = _mm256_setzero_ps();
                 // pointer of the int4 weights
                 const __m256i *w_start = (__m256i *)&B->int4_data_ptr[col * k / 2];
@@ -100,6 +101,8 @@ namespace matmul
                 float *sa_ptr = &params->A_scales[row * k / 32];
 
                 const int num_block = k / block_size;
+
+                //用于高效提取后4位的mask
                 const __m256i low_mask = _mm256_set1_epi8(0x0F);
                 // Compute two blocks in each iteration
                 for (int q = 0; q < num_block; q += 2)

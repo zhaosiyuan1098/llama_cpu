@@ -41,12 +41,23 @@ add_executable(quick_infer
         ${KERNEL_SOURCES}
 )
 
+target_compile_definitions(quick_infer PRIVATE
+        "PROJECT_ROOT_DIR=\"${PROJECT_SOURCE_DIR}\""
+)
+
 # 6. 通过 IMP 宏设置 Matmul 实现
-set(QUICK_INFER_MATMUL_IMPLEMENTATION "2" CACHE STRING "选择要使用的 matmul 实现 (0-4)")
+
+#--linear层乘法实现方式
+#-- 0 最原始的实现
+#-- 1 循环展开
+#-- 2 多线程
+#-- 3 simd
+#-- 4 使用多线程+simd+循环展开加速
+set(QUICK_INFER_MATMUL_IMPLEMENTATION "4" CACHE STRING "选择要使用的 matmul 实现 (0-4)")
 set_property(CACHE QUICK_INFER_MATMUL_IMPLEMENTATION PROPERTY STRINGS "0" "1" "2" "3" "4")
 target_compile_definitions(quick_infer PRIVATE "IMP=${QUICK_INFER_MATMUL_IMPLEMENTATION}")
 # 通过 NUM_THREAD 宏设置使用线程数量
-set(NUM_THREADS "10" CACHE STRING "Set the number of threads for multithreading")
+set(NUM_THREADS "12" CACHE STRING "Set the number of threads for multithreading")
 target_compile_definitions(quick_infer PRIVATE "NUM_THREAD_MATMUL=${NUM_THREADS}")
 
 # --- 从这里开始修复 ---
