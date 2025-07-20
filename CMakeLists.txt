@@ -39,6 +39,7 @@ add_executable(quick_infer
         ${MODULE_SOURCES}
         ${OPERATION_SOURCES}
         ${KERNEL_SOURCES}
+        src/threadPool.cpp
 )
 
 target_compile_definitions(quick_infer PRIVATE
@@ -57,7 +58,7 @@ set(QUICK_INFER_MATMUL_IMPLEMENTATION "4" CACHE STRING "选择要使用的 matmu
 set_property(CACHE QUICK_INFER_MATMUL_IMPLEMENTATION PROPERTY STRINGS "0" "1" "2" "3" "4")
 target_compile_definitions(quick_infer PRIVATE "IMP=${QUICK_INFER_MATMUL_IMPLEMENTATION}")
 # 通过 NUM_THREAD 宏设置使用线程数量
-set(NUM_THREADS "12" CACHE STRING "Set the number of threads for multithreading")
+set(NUM_THREADS "24" CACHE STRING "Set the number of threads for multithreading")
 target_compile_definitions(quick_infer PRIVATE "NUM_THREAD_MATMUL=${NUM_THREADS}")
 
 # --- 从这里开始修复 ---

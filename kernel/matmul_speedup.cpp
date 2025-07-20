@@ -8,6 +8,8 @@
 #include "matmul.h"
 #include "opt_params.h"
 #include "common.h"
+#include "threadPool.h"
+#include <vector>
 
 #ifdef QM_ARM
 #include <arm_neon.h>
@@ -15,6 +17,9 @@
 #ifdef QM_x86
 #include <immintrin.h>
 #endif
+
+
+static threadPool g_thread_pool(NUM_THREAD_MATMUL);
 
 struct w4a8_thread_args
 {
@@ -29,6 +34,7 @@ static void *all_techniques_worker_func(void *args)
     const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
     int n = params->C.column, m = params->C.row, k = params->A.column, block_size = params->block_size;
     // const int num_block = k / block_size; // block_size = 32
+
 
     for (int row = 0; row < m; row++)
     {
@@ -257,53 +263,56 @@ namespace matmul
 {
     void MatmulOperator::mat_mul_all_techniques(struct matmul_params *params)
     {
-        int i, j, k;
         const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
         const int block_size = params->block_size;
-        float *scale = params->scales, *offset = params->offset;
 
-        assert(params->block_size % 32 == 0); // support block size to be multiples of 32
-        assert(A->row == C->row);             // support block size to be multiples of 32
+        assert(params->block_size % 32 == 0);
+        assert(A->row == C->row);
 
         quantize_fp32_to_int8(A->data_ptr, A->int8_data_ptr, params->A_scales, A->row * A->column, block_size);
 
-        const  int num_thread = NUM_THREAD_MATMUL;
-        pthread_t thread_pool[num_thread];
-        struct w4a8_thread_args threads_args[num_thread];
-        assert(params->block_size == 32); // support block size 32 for now
+        const int num_thread = NUM_THREAD_MATMUL;
 
+        // 使用 std::vector 保证参数的生命周期
+        std::vector<w4a8_thread_args> threads_args(num_thread);
+
+        // 提交任务到全局线程池
         for (int j = 0; j < num_thread; j++)
         {
             threads_args[j].params = params;
             threads_args[j].start_j = j * (C->column / num_thread);
             threads_args[j].end_j = (j + 1) * (C->column / num_thread);
-            pthread_create(&thread_pool[j], nullptr, all_techniques_worker_func, &threads_args[j]);
+
+            g_thread_pool.submit([args = &threads_args[j]]() {
+                all_techniques_worker_func(args);
+            });
         }
 
-        for (unsigned long j : thread_pool)
-        {
-            pthread_join(j, nullptr);
-        }
+        // 等待这一批任务全部完成
+        g_thread_pool.wait_for_completion();
     }
 
     void MatmulOperator::mat_mul_transposed_all_techniques(struct matmul_params* params)
     {
-        const int num_thread = 8;
-        pthread_t thread_pool[num_thread];
-        struct w4a8_thread_args_transposed threads_args[num_thread];
+        const int num_thread = NUM_THREAD_MATMUL; // 使用统一的线程数定义
         const struct matrix *C = &params->C;
 
+        // 使用 std::vector 保证参数的生命周期
+        std::vector<w4a8_thread_args_transposed> threads_args(num_thread);
+
+        // 提交任务到全局线程池
         for (int i = 0; i < num_thread; i++)
         {
             threads_args[i].params = params;
             threads_args[i].start_i = i * (C->row / num_thread);
             threads_args[i].end_i = (i + 1) * (C->row / num_thread);
-            pthread_create(&thread_pool[i], nullptr, all_techniques_worker_func_transposed, &threads_args[i]);
+
+            g_thread_pool.submit([args = &threads_args[i]]() {
+                all_techniques_worker_func_transposed(args);
+            });
         }
 
-        for (unsigned long i : thread_pool)
-        {
-            pthread_join(i, nullptr);
-        }
+        // 等待这一批任务全部完成
+        g_thread_pool.wait_for_completion();
     }
 } // namespace matmul

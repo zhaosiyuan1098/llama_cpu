@@ -9,6 +9,11 @@
 #include "common.h"
 #include "operators.h"
 
+#include "threadPool.h" // 引入我们的线程池
+#include "common.h"     // 为了 NUM_THREAD_MATMUL
+
+static threadPool g_thread_pool(NUM_THREAD_MATMUL);
+
 struct multithreading_thread_args {
     int start, end;
     const struct matmul_params* params;
@@ -99,29 +104,32 @@ static void* multithreading_worker_func(void* args) {
 }
 
 namespace matmul {
-void MatmulOperator::mat_mul_multithreading(struct matmul_params* params) {
-    const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
-    const int block_size = params->block_size;
+    void MatmulOperator::mat_mul_multithreading(struct matmul_params* params) {
+        const struct matrix *A = &params->A, *B = &params->B, *C = &params->C;
+        const int block_size = params->block_size;
 
-    quantize_fp32_to_int8(A->data_ptr, A->int8_data_ptr, params->A_scales, A->row * A->column, block_size);
+        quantize_fp32_to_int8(A->data_ptr, A->int8_data_ptr, params->A_scales, A->row * A->column, block_size);
 
-    int m = C->row, n = C->column, k = A->column;
+        int n = C->column;
+        const int num_thread = NUM_THREAD_MATMUL;
 
-    const int num_thread = NUM_THREAD_MATMUL;
+        // 使用 std::vector 来存储线程参数，以确保其生命周期在任务执行时仍然有效
+        std::vector<multithreading_thread_args> threads_args(num_thread);
 
-    pthread_t thread_pool[num_thread];
-    struct multithreading_thread_args threads_args[num_thread];
+        // 提交任务到全局线程池
+        for (int j = 0; j < num_thread; j++) {
+            threads_args[j].params = params;
+            threads_args[j].start = j * (n / num_thread);
+            threads_args[j].end = (j + 1) * (n / num_thread);
 
-    // TODO: Thread creation
-    for (int j = 0; j < num_thread; j++) {
-        threads_args[j].params = params;
-        threads_args[j].start = j * (n / num_thread);  // n is C->column
-        threads_args[j].end = (j + 1) * (n / num_thread);
-        pthread_create(&thread_pool[j], nullptr, multithreading_worker_func, &threads_args[j]);
-    }
-    // TODO: Join threads
-    for (unsigned long j : thread_pool){
-        pthread_join(j, nullptr);
-    }
-};
+            // 捕获指向当前参数的指针，并提交给线程池
+            g_thread_pool.submit([args = &threads_args[j]]() {
+                multithreading_worker_func(args);
+            });
+        }
+
+        // 等待线程池完成这一批次的所有任务
+        g_thread_pool.wait_for_completion();
+    };
+
 }  // namespace matmul
