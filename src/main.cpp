@@ -120,7 +120,7 @@ int main(int argc, char **argv)
             while (i<1)
             {
                 std::cout << "USER: ";
-                std::string input="how to drink a cup of tea?";
+                std::string input="how to get a cup of tea";
                 // std::getline(std::cin, input);
                 input = "A chat between a human and an assistant.\n\n### Human: " + input + "\n### Assistant: \n";
                 std::filesystem::path vocab_path_fs = project_root / "model" / "vocab" / "llama_vocab.bin";

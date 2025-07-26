@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # 1. 项目定义
-project(quick_infer VERSION 0.1.0 LANGUAGES CXX)
+project(quick_infer VERSION 0.1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
@@ -58,7 +58,7 @@ set(QUICK_INFER_MATMUL_IMPLEMENTATION "4" CACHE STRING "选择要使用的 matmu
 set_property(CACHE QUICK_INFER_MATMUL_IMPLEMENTATION PROPERTY STRINGS "0" "1" "2" "3" "4")
 target_compile_definitions(quick_infer PRIVATE "IMP=${QUICK_INFER_MATMUL_IMPLEMENTATION}")
 # 通过 NUM_THREAD 宏设置使用线程数量
-set(NUM_THREADS "24" CACHE STRING "Set the number of threads for multithreading")
+set(NUM_THREADS "28" CACHE STRING "设定使用线程数量")
 target_compile_definitions(quick_infer PRIVATE "NUM_THREAD_MATMUL=${NUM_THREADS}")
 
 # --- 从这里开始修复 ---
@@ -78,7 +78,36 @@ endif()
 # 8. 链接必要的库 (已添加)
 target_link_libraries(quick_infer PRIVATE pthread)
 
-# --- 修复结束 ---
+# 9. Add a new executable for benchmarking
+add_executable(benchmark
+        src/benchmark.cpp
+        src/utlis.cpp
+        src/llamaTokenlizer.cpp
+        src/generate.cpp
+        ${MODULE_SOURCES}
+        ${OPERATION_SOURCES}
+        ${KERNEL_SOURCES}
+        src/threadPool.cpp
+)
+
+target_compile_definitions(benchmark PRIVATE
+        "PROJECT_ROOT_DIR=\"${PROJECT_SOURCE_DIR}\"")
+
+target_compile_definitions(benchmark PRIVATE "IMP=${QUICK_INFER_MATMUL_IMPLEMENTATION}")
+target_compile_definitions(benchmark PRIVATE "NUM_THREAD_MATMUL=${NUM_THREADS}")
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|i386")
+    target_compile_definitions(benchmark PRIVATE QM_x86)
+    target_compile_options(benchmark PRIVATE -mavx2 -mfma)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm")
+    target_compile_definitions(benchmark PRIVATE QM_ARM)
+    target_compile_options(benchmark PRIVATE -mfpu=neon)
+endif()
+
+target_link_libraries(benchmark PRIVATE pthread)
+
+message(STATUS "Benchmark target 'benchmark' 添加完成.")
+
 
 message(STATUS "quick_infer 配置成功！")
 message(STATUS "Matmul 实现方式 (通过 IMP 宏选择): ${QUICK_INFER_MATMUL_IMPLEMENTATION}")
